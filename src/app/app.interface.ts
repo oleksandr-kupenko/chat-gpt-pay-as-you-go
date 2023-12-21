@@ -1,3 +1,4 @@
+export const CHAT_KEY = "chat_key";
 export enum GPT_MODEL {
   GPT_35 = "gpt-3.5-turbo-0301",
   GPT_4 = "gpt-4-1106-preview",

@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {GPT_MODEL, Message, RequestData, ResponseData} from "./app.interface";
+import {CHAT_KEY, GPT_MODEL, Message, RequestData, ResponseData} from "./app.interface";
 
 @Injectable({providedIn: "root"})
 export class AppService {
@@ -24,5 +24,17 @@ export class AppService {
     };
 
     return this.http.post<ResponseData>(this.apiUrl, JSON.stringify(body), {headers: this.headers});
+  }
+
+  saveKey(apiKey: string) {
+    localStorage.setItem(CHAT_KEY, apiKey);
+  }
+
+  getKey(): string | null {
+    return localStorage.getItem(CHAT_KEY);
+  }
+
+  deleteKey() {
+    localStorage.removeItem(CHAT_KEY);
   }
 }

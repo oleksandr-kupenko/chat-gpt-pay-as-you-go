@@ -27,7 +27,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public ROLE = ROLE;
 
-  public form!: FormGroup;
+  public chatForm!: FormGroup;
+  public settingsForm!: FormGroup;
 
   public models: {value: string; viewValue: string}[] = [
     {value: GPT_MODEL.GPT_35, viewValue: "GPT-3.5"},
@@ -35,6 +36,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   ];
 
   public messages: Message[] = messagesMock;
+  public currentKey = signal("");
 
   private subs = new Subscription();
 
@@ -44,7 +46,10 @@ export class AppComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
+    this.getApiKey();
+
     this.initForm();
+    this.initSettingsForm();
   }
 
   ngAfterViewInit() {
@@ -52,14 +57,14 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   public handleSend() {
-    if (this.form.valid) {
+    if (this.chatForm.valid) {
       this.isLoading.set(true);
-      const model = this.form.value.model.value;
-      this.appService.setRequestHeaders(this.form.value.key);
+      const model = this.chatForm.value.model.value;
+      this.appService.setRequestHeaders(this.chatForm.value.key);
 
-      const message: Message = {role: ROLE.user, content: this.form.value.question};
+      const message: Message = {role: ROLE.user, content: this.chatForm.value.question};
       this.messages.push(message);
-      this.form.patchValue({question: ""});
+      this.chatForm.patchValue({question: ""});
       this.appService
         .postQuestion({model, messages: this.messages})
         .pipe(finalize(() => this.isLoading.set(false)))
@@ -75,11 +80,32 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
+  public handleSaveSettings() {
+    const key = this.settingsForm.value.key;
+    this.currentKey.set(key);
+    this.appService.saveKey(key);
+  }
+
+  public handleDeleteKey() {
+    this.currentKey.set("");
+    this.appService.deleteKey();
+    this.settingsForm.patchValue({key: ""});
+  }
+
+  public handleKeyInput() {
+    this.settingsForm.get("key")?.markAsTouched();
+  }
+
   private initForm() {
-    this.form = this.fb.group({
+    this.chatForm = this.fb.group({
       model: [this.models[0], Validators.required],
       question: ["", [Validators.required]],
-      key: ["", Validators.required],
+    });
+  }
+
+  private initSettingsForm() {
+    this.settingsForm = this.fb.group({
+      key: [this.currentKey(), Validators.required],
     });
   }
 
@@ -89,5 +115,9 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.messageElList.last.nativeElement.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
       }),
     );
+  }
+
+  private getApiKey() {
+    this.currentKey.set(this.appService.getKey() || "");
   }
 }
