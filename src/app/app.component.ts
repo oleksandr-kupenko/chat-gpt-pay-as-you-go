@@ -6,78 +6,47 @@ import {
   OnInit,
   QueryList,
   signal,
+  ViewChild,
   ViewChildren,
-} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AppService} from "./app.service";
-import {GPT_MODEL, Message, ROLE} from "./app.interface";
-import {finalize, Subscription} from "rxjs";
-import {messagesMock} from "./app.mock";
+} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {AppService} from './app.service';
+import {Observable, Subscription} from 'rxjs';
+import {SettingsMenuService} from './shared/services/settings-menu.service';
 
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-  styleUrl: "./app.component.scss",
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  @ViewChildren("messageRef") messageElList!: QueryList<ElementRef>;
+  @ViewChild('keyInputRef') keyInputEl!: ElementRef;
 
   public isLoading = signal(false);
-
-  public ROLE = ROLE;
-
-  public chatForm!: FormGroup;
   public settingsForm!: FormGroup;
+  public currentKey = signal('');
 
-  public models: {value: string; viewValue: string}[] = [
-    {value: GPT_MODEL.GPT_35, viewValue: "GPT-3.5"},
-    {value: GPT_MODEL.GPT_4, viewValue: "GPT-4"},
-  ];
+  public isKeyFieldReadOnly = true;
 
-  public messages: Message[] = messagesMock;
-  public currentKey = signal("");
+  public isSettingsMenuOpened = signal(false);
 
   private subs = new Subscription();
 
   constructor(
     private fb: FormBuilder,
     private appService: AppService,
+    private settingsBtnService: SettingsMenuService,
   ) {}
 
   ngOnInit() {
-    this.getApiKey();
-
-    this.initForm();
+    this.initApiKey();
     this.initSettingsForm();
+    this.subscribeToIsSettingsOpen();
   }
 
   ngAfterViewInit() {
-    this.subscribeToMessagesEl();
-  }
-
-  public handleSend() {
-    if (this.chatForm.valid) {
-      this.isLoading.set(true);
-      const model = this.chatForm.value.model.value;
-      this.appService.setRequestHeaders(this.chatForm.value.key);
-
-      const message: Message = {role: ROLE.user, content: this.chatForm.value.question};
-      this.messages.push(message);
-      this.chatForm.patchValue({question: ""});
-      this.appService
-        .postQuestion({model, messages: this.messages})
-        .pipe(finalize(() => this.isLoading.set(false)))
-        .subscribe((data) => {
-          this.messages.push(data.choices[0].message);
-          setTimeout(() => {
-            this.messageElList.last.nativeElement.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-          }, 100);
-
-          console.log("DATA", this.messages);
-        });
-      this.isLoading.set(false);
-    }
+    this.subs.unsubscribe();
   }
 
   public handleSaveSettings() {
@@ -87,20 +56,28 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   public handleDeleteKey() {
-    this.currentKey.set("");
+    this.currentKey.set('');
     this.appService.deleteKey();
-    this.settingsForm.patchValue({key: ""});
+    this.settingsForm.patchValue({key: ''});
   }
 
   public handleKeyInput() {
-    this.settingsForm.get("key")?.markAsTouched();
+    this.settingsForm.get('key')?.markAsTouched();
+    if (!this.settingsForm.get('key')?.value) {
+      this.isKeyFieldReadOnly = true;
+      setTimeout(() => {
+        this.isKeyFieldReadOnly = false;
+        this.keyInputEl.nativeElement.click();
+      });
+    }
   }
 
-  private initForm() {
-    this.chatForm = this.fb.group({
-      model: [this.models[0], Validators.required],
-      question: ["", [Validators.required]],
-    });
+  public handleEnableInput() {
+    this.isKeyFieldReadOnly = false;
+  }
+
+  public handleCloseSettingsMenu() {
+    this.settingsBtnService.toggleIsMenuOpen();
   }
 
   private initSettingsForm() {
@@ -109,15 +86,17 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private subscribeToMessagesEl() {
-    this.subs.add(
-      this.messageElList.changes.subscribe(() => {
-        this.messageElList.last.nativeElement.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-      }),
-    );
+  private initApiKey() {
+    this.appService.initKey();
+    this.currentKey.set(this.appService.getKey() || '');
   }
 
-  private getApiKey() {
-    this.currentKey.set(this.appService.getKey() || "");
+  private subscribeToIsSettingsOpen() {
+    this.settingsBtnService.getIsMenuOpen.subscribe((data) => {
+      this.isSettingsMenuOpened.set(data.status);
+      if (data.keyError) {
+        this.settingsForm.get('key')?.markAsTouched();
+      }
+    });
   }
 }

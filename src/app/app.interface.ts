@@ -1,13 +1,19 @@
-export const CHAT_KEY = "chat_key";
+export const CHAT_KEY = 'chat_key';
 export enum GPT_MODEL {
-  GPT_35 = "gpt-3.5-turbo-0301",
-  GPT_4 = "gpt-4-1106-preview",
+  GPT_35 = 'gpt-3.5-turbo',
+  GPT_4 = 'gpt-4-1106-preview',
 }
 
 export enum ROLE {
-  system = "system",
-  user = "user",
-  assistant = "assistant",
+  system = 'system',
+  user = 'user',
+  assistant = 'assistant',
+}
+
+export interface config {
+  chat: {
+    model: GPT_MODEL;
+  };
 }
 
 export interface Message {
@@ -22,7 +28,7 @@ export interface RequestData {
 
 export interface ResponseData {
   id: string;
-  object: "chat.completion";
+  object: 'chat.completion';
   created: number;
   model: string;
   choices: [
@@ -30,7 +36,7 @@ export interface ResponseData {
       index: number;
       message: Message;
       logprobs: null | unknown;
-      finish_reason: "stop" | string;
+      finish_reason: 'stop' | string;
     },
   ];
   usage: {

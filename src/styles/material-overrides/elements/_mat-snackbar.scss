@@ -1,0 +1,43 @@
+@import 'core/variables';
+
+mat-snack-bar-container.mat-mdc-snack-bar-container {
+  .mdc-snackbar__surface {
+    cursor: pointer;
+    color: $white;
+    box-shadow: 0 3px 30px rgba(29, 26, 47, 0.05);
+    max-height: 52px;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    width: auto;
+    min-width: auto;
+    max-width: none;
+    padding-right: 20px;
+  }
+
+  &.snackbar-success .mdc-snackbar__surface {
+    background-color: $action_green;
+  }
+
+  &.snackbar-error .mdc-snackbar__surface {
+    background-color: $alert_red;
+  }
+
+  &.snackbar-warning .mdc-snackbar__surface {
+    background-color: $secondary_purple;
+  }
+
+  &.snackbar-info .mdc-snackbar__surface {
+    background-color: $action_yellow;
+    color: $primary_purple;
+  }
+  //
+  //mv-icon-bell,
+  //mv-icon-warning-circle,
+  //mv-icon-close {
+  //  width: 32px;
+  //  height: 32px;
+  //  margin-right: 12px;
+  //}
+}
+

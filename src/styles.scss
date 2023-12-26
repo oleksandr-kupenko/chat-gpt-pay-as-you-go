@@ -94,6 +94,7 @@ body {
     border: 1px solid rgba(217,217,227,.2);
     border-radius: 16px;
   }
+
   .mat-mdc-select,
   .mat-mdc-option,
   .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-floating-label, .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-floating-label--float-above,
@@ -111,6 +112,18 @@ body {
   .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):not(.mat-mdc-option-multiple),
   .mat-mdc-option:hover:not(.mdc-list-item--disabled) {
     background-color: hsla(0,0%,100%,.05);
+  }
+
+  button {
+    mat-icon {
+      color: #9a9aa0;
+    }
+
+    &:hover {
+      mat-icon {
+        color: rgba(217,217,227,.2);
+      }
+    }
   }
 
   .mat-mdc-option.mdc-list-item {
