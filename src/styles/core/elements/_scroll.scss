@@ -1,0 +1,25 @@
+::-webkit-scrollbar {
+  height: 0.5rem;
+  width: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgba(217,217,227,.25);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsla(0,0%,100%,.1);
+}
+
+::-webkit-scrollbar-thumb {
+  --tw-border-opacity: 1;
+  border-color: rgba(255,255,255,1);
+  border-radius: 9999px;
+  border-width: 1px;
+}

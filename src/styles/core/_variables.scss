@@ -1,34 +1,15 @@
 /* BASE COLORS */
-$dark_blue: #403f4c;
-$primary_purple: #262240;
-$inactive_purple: #bbb8d1;
-$oxford_blue: #0a122a;
-$secondary_purple: #494568;
-$secondary_inactive_purple: #efedff;
-
-$bg_purple: #f4f2ff;
-$bg_green: #e2fff1;
-$bg_yellow: #fff6e1;
-$bg_red: #fff2ef;
-$bg_primary: #f9f9ff;
-
-$action_yellow: #fbd65e;
-$action_green: #23bd7c;
-$alert_red: #d5573b;
-$stroke_grey: #e2e1e9;
-
-$dark_orange: #ffbf1b;
-
-$inactive_purple_hover: #908ea3;
-$action_green_hover: #218c5f;
+$text-color: #d9d9e3;
+$text-code: white;
+$dark-background: #343541;
 
 $white: white;
 
-$overlay: rgba(
-        $color: $secondary_purple,
-        $alpha: 0.4,
-);
+$secondary_purple: #494568;
+$alert_red: #d5573b;
+$action_yellow: #fbd65e;
+$primary_purple: #262240;
+$action_green: #23bd7c;
 
 /* SETTINGS */
-
 $trs: 0.2s;

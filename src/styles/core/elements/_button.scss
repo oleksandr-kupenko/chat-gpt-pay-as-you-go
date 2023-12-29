@@ -1,0 +1,13 @@
+body {
+  button {
+    mat-icon {
+      color: #9a9aa0;
+    }
+
+    &:hover {
+      mat-icon {
+        color: rgba(217,217,227,.2);
+      }
+    }
+  }
+}

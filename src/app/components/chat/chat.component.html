@@ -15,7 +15,7 @@
   </div>
 
   <div class="h-75 d-inline-block mb-4 border ps-3 pe-3 pt-2 pb-2 overflow-auto">
-    @for (message of messages; track message) {
+    @for (message of messages(); track message) {
       <div #messageRef class="message-wrapper d-flex">
         <div class="d-flex">
           <div
@@ -31,7 +31,7 @@
         </div>
         <div class="message pb-4">
           <span class="message__owner d-flex text-white fw-bold text-capitalize">{{ message.role }}</span>
-          <p class="message__body">{{ message.content }}</p>
+          <div class="message__body" [innerHTML]="message.content | safeMarked"></div>
         </div>
       </div>
     }

@@ -1,4 +1,5 @@
 .message {
+  width: calc(100% - 32px);
   &__owner {
     &--icon {
       width: 24px;
@@ -12,4 +13,8 @@
       }
     }
   }
+
+
 }
+
+
