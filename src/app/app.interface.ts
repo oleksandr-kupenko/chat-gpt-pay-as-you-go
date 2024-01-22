@@ -1,4 +1,5 @@
 export const CHAT_KEY = 'chat_key';
+export const STATE_KEY = 'chat_key';
 export enum GPT_MODEL {
   GPT_35 = 'gpt-3.5-turbo',
   GPT_4 = 'gpt-4-1106-preview',
@@ -10,10 +11,27 @@ export enum ROLE {
   assistant = 'assistant',
 }
 
-export interface config {
-  chat: {
-    model: GPT_MODEL;
+export class State {
+  settings: {
+    rememberKey: boolean;
+  } = {
+    rememberKey: false,
   };
+
+  chat: {
+    model: GPT_MODEL | string;
+    chats: Chat[];
+  } = {
+    model: GPT_MODEL.GPT_35,
+    chats: [],
+  };
+}
+
+export interface Chat {
+  name: string;
+  id: string;
+  messages: Message[];
+  tokens: number;
 }
 
 export interface Message {
