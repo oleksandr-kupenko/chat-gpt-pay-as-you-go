@@ -1,63 +1,58 @@
-<form class="container vh-100 d-flex flex-column pt-4 pb-2" [formGroup]="chatForm" (ngSubmit)="handleSend()">
-  <div class="header-settings d-flex justify-content-between">
-    <mat-form-field class="col-4 col-lg-2">
-      <mat-label>Model</mat-label>
-      <mat-select formControlName="model">
-        @for (model of models; track model) {
-          <mat-option [value]="model">{{ model.viewValue }}</mat-option>
+<mat-drawer-container autosize class="container-fluid bg-transparent" (window:resize)="handleResize($event)">
+  <mat-drawer #drawer class="chat-list-drawer flex-column" mode="side" [opened]="isChatsListOpened()">
+    <app-chats-list [isShowCloseBtn]="isShowChatsListBtn()" (closeChatsList)="handleToggleChatsList(false)">
+    </app-chats-list>
+  </mat-drawer>
+  <form class="container vh-100 d-flex flex-column pt-4 pb-2" [formGroup]="chatForm" (ngSubmit)="handleSend()">
+    <div class="header-settings d-flex justify-content-between mb-3">
+      <div class="d-flex align-items-center col-10 col-sm-6 col-lg-3 col-xl-4 col-xxl-3">
+        @if (isShowChatsListBtn()) {
+          <button class="me-4 icon-btn" (click)="handleToggleChatsList(true)">
+            <mat-icon class="d-flex" svgIcon="navbar"></mat-icon>
+          </button>
         }
-      </mat-select>
-    </mat-form-field>
-
-    <div class="header-settings__controls d-flex align-items-center justify-content-sm-between">
-      <app-settings-btn></app-settings-btn>
-    </div>
-  </div>
-
-  <div class="h-75 d-inline-block mb-4 border ps-3 pe-3 pt-2 pb-2 overflow-auto">
-    @for (message of messages(); track message) {
-      <div #messageRef class="message-wrapper d-flex">
-        <div class="d-flex">
-          <div
-            class="message__owner--icon d-flex justify-content-center align-items-center me-2"
-            [class.user]="message.role === ROLE.user"
-          >
-            @if (message.role === ROLE.user) {
-              <mat-icon class="d-flex" svgIcon="user"></mat-icon>
-            } @else {
-              <mat-icon class="d-flex" svgIcon="chat-gpt"></mat-icon>
+        <mat-form-field class="without-wrapper col-6 col-sm-8">
+          <mat-label>Model</mat-label>
+          <mat-select formControlName="model" (selectionChange)="handleModelChange()">
+            @for (model of models; track model) {
+              <mat-option [value]="model">{{ model.viewValue }}</mat-option>
             }
-          </div>
-        </div>
-        <div class="message pb-4">
-          <span class="message__owner d-flex text-white fw-bold text-capitalize">{{ message.role }}</span>
-          <div class="message__body" [innerHTML]="message.content | safeMarked"></div>
-        </div>
+          </mat-select>
+        </mat-form-field>
       </div>
-    }
-  </div>
-  <div class="row h-25 d-flex justify-content-center">
-    <mat-form-field class="main-form w-100 h-100">
-      <textarea
-        class="w-100 h-100 example-full-width"
-        placeholder="Question"
-        formControlName="question"
-        [cdkTextareaAutosize]="true"
-        matInput
-      ></textarea>
-    </mat-form-field>
-  </div>
-  <button
-    type="submit"
-    class="col-1 ms-auto"
-    mat-raised-button
-    color="primary"
-    [disabled]="isLoading() || !chatForm.value.question"
-  >
-    @if (isLoading()) {
-      <mat-spinner [diameter]="25"></mat-spinner>
-    } @else {
-      <span>Send</span>
-    }
-  </button>
-</form>
+
+      <div class="header-settings__controls d-flex align-items-center justify-content-sm-between">
+        <app-settings-btn></app-settings-btn>
+      </div>
+    </div>
+
+    <div class="h-75 d-inline-block mb-4 border ps-3 pe-3 pt-2 pb-2 overflow-auto">
+      <app-messages [messages]="messages()"></app-messages>
+    </div>
+
+    <div class="row h-25 d-flex justify-content-center">
+      <mat-form-field class="main-form w-100 h-100">
+        <textarea
+          class="w-100 h-100 example-full-width"
+          placeholder="Question"
+          formControlName="question"
+          [cdkTextareaAutosize]="true"
+          matInput
+        ></textarea>
+      </mat-form-field>
+    </div>
+    <button
+      type="submit"
+      class="col-1 ms-auto"
+      mat-raised-button
+      color="primary"
+      [disabled]="isLoading() || !chatForm.value.question"
+    >
+      @if (isLoading()) {
+        <mat-spinner [diameter]="25"></mat-spinner>
+      } @else {
+        <span>Send</span>
+      }
+    </button>
+  </form>
+</mat-drawer-container>

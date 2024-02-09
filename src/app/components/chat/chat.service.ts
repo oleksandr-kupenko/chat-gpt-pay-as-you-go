@@ -1,23 +1,20 @@
-import {Inject, Injectable} from "@angular/core";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {RequestData, ResponseData} from "../../app.interface";
-import {Observable} from "rxjs";
+import {Inject, Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {Chat, GPT_MODEL, RequestData, ResponseData} from '../../app.interface';
+import {Observable, of} from 'rxjs';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class ChatService {
   constructor(
     private http: HttpClient,
-    @Inject("API_URL") private API_URL: string,
+    @Inject('API_URL') private API_URL: string,
   ) {}
 
   postQuestion(data: RequestData): Observable<ResponseData> {
-    const body = {
-      model: data.model,
-      messages: data.messages,
-    };
-
-    return this.http.post<ResponseData>(this.API_URL, JSON.stringify(body));
+    console.log('DATA', data);
+    //return of();
+    return this.http.post<ResponseData>(this.API_URL, JSON.stringify(data));
   }
 }

@@ -1,0 +1,15 @@
+@import 'core/variables';
+
+:host {
+  display: flex;
+  height: 100%;
+  background-color: $black-background;
+
+  .chats {
+    &__list {
+      marker: none;
+    }
+  }
+}
+
+

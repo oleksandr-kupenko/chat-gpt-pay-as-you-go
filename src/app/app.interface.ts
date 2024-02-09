@@ -1,3 +1,5 @@
+import {EntityState} from '@ngrx/entity';
+
 export const CHAT_KEY = 'chat_key';
 export const STATE_KEY = 'chat_key';
 export enum GPT_MODEL {
@@ -32,7 +34,11 @@ export interface Chat {
   id: string;
   messages: Message[];
   tokens: number;
+  model: GPT_MODEL | string;
+  created: number;
 }
+
+export interface ChatState extends EntityState<Chat> {}
 
 export interface Message {
   role: ROLE;

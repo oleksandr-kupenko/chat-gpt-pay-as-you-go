@@ -1,13 +1,86 @@
+@import 'core/variables';
+
 body {
-  button {
+  .icon-btn {
     mat-icon {
-      color: #9a9aa0;
+      color: $grey;
     }
 
     &:hover {
       mat-icon {
         color: rgba(217,217,227,.2);
       }
+    }
+
+    &.light {
+      mat-icon {
+        color: $white;
+      }
+
+      &:hover {
+        mat-icon {
+          color: $grey
+        }
+      }
+    }
+  }
+
+  .list-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    color: $text-color;
+    font-size: .875rem;
+    cursor: pointer;
+    transition: $trs;
+
+    a {
+      text-decoration: none;
+      color: $text-color;
+    }
+
+    &__main-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      padding: 0.25rem;
+      color: $black-background;
+      background: $white;
+    }
+
+    &__title {
+      flex-grow: 1;
+      text-align: left;
+    }
+
+    &__additional-icon {
+      display: none;
+      align-items: center;
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+    }
+
+    &:hover {
+      background-color: $very-dark-grey;
+
+      .list-btn__additional-icon {
+        display: flex;
+      }
+    }
+  }
+
+  .list-btn-main {
+    color: $white;
+    font-weight: 500;
+
+    .list-btn__additional-icon {
+      display: flex;
     }
   }
 }

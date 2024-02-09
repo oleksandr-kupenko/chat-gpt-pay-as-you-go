@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {NgModule, isDevMode} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterModule, RouterOutlet} from '@angular/router';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -17,6 +17,11 @@ import {routes} from './app.routes';
 import {AuthInterceptor} from './interceptors/auth.interceptor';
 import {API_URL} from '../config';
 import {ErrorInterceptor} from './interceptors/error.interceptor';
+import {StoreModule} from '@ngrx/store';
+import {StoreDevtoolsModule} from '@ngrx/store-devtools';
+import {chatFeatureKey, chatReducers} from './components/chat/state/chat.reducers';
+import {EffectsModule} from '@ngrx/effects';
+import * as chatEffects from './components/chat/state/chat.effects';
 
 @NgModule({
   declarations: [AppComponent],
@@ -36,6 +41,13 @@ import {ErrorInterceptor} from './interceptors/error.interceptor';
     MatIconModule,
     MatSidenavModule,
     RouterModule.forRoot(routes),
+    // StoreModule.forRoot(reducers, {
+    //   metaReducers,
+    // }),
+    StoreModule.forRoot({[chatFeatureKey]: chatReducers}),
+    StoreModule.forFeature(chatFeatureKey, chatReducers),
+    StoreDevtoolsModule.instrument({maxAge: 25, logOnly: !isDevMode()}),
+    EffectsModule.forRoot(chatEffects),
   ],
   providers: [
     {

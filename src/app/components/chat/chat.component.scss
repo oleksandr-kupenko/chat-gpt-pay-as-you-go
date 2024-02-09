@@ -1,20 +1,11 @@
-.message {
-  width: calc(100% - 32px);
-  &__owner {
-    &--icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      padding: 0.25rem;
-      background-color: #19c37d;
+@import "../../node_modules/bootstrap/scss/bootstrap-grid.scss";
 
-      &.user {
-        background-color: #b49255;
-      }
-    }
+.chat-list-drawer {
+  width: 100%;
+  padding-left: 0;
+
+  @include media-breakpoint-up(sm) {
+      width: 260px;
   }
-
-
 }
-
 

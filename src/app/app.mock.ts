@@ -8,10 +8,10 @@ export const messagesMock: Message[] = [
   },
 ];
 
-const config: State = {
+export const configMock: State = {
   settings: {rememberKey: true},
   chat: {
     model: GPT_MODEL.GPT_35,
-    chats: [{tokens: 500, id: 'some-id', messages: messagesMock, name: 'Some name'}],
+    chats: [{tokens: 500, id: '0', messages: messagesMock, name: 'Some name', model: GPT_MODEL.GPT_35}],
   },
 };
