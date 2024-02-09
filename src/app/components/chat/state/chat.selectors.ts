@@ -5,5 +5,5 @@ const selectChatState = createFeatureSelector<ChatState>(chatFeatureKey);
 
 export const currentChatSelector = (id: string) =>
   createSelector(selectChatState, (chatState: ChatState) => {
-    return chatState.chats.find((chat) => chat.id === id);
+    return chatState.chats.entities[id];
   });

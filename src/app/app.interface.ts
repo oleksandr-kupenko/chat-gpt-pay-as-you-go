@@ -32,22 +32,28 @@ export class State {
 export interface Chat {
   name: string;
   id: string;
-  messages: Message[];
+  messages: MessageEntities;
   tokens: number;
   model: GPT_MODEL | string;
   created: number;
 }
 
-export interface ChatState extends EntityState<Chat> {}
+export interface ChatEntities extends EntityState<Chat> {}
+export interface MessageEntities extends EntityState<Message> {}
 
 export interface Message {
   role: ROLE;
   content: string;
+  id: string;
+}
+
+export interface MessageWithoutId extends Omit<Message, 'id'> {
+  id?: never;
 }
 
 export interface RequestData {
   model: GPT_MODEL;
-  messages: Message[];
+  messages: MessageWithoutId[];
 }
 
 export interface ResponseData {
@@ -58,7 +64,7 @@ export interface ResponseData {
   choices: [
     {
       index: number;
-      message: Message;
+      message: MessageWithoutId;
       logprobs: null | unknown;
       finish_reason: 'stop' | string;
     },

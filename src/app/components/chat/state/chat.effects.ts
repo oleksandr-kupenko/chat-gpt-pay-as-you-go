@@ -4,6 +4,7 @@ import {ChatService} from '../chat.service';
 import {addChatMessageAction, chatAnswerFailed, chatAnswerLoaded, getAnswerAction} from './chat.actions';
 import {concatMap, map, of} from 'rxjs';
 import {catchError} from 'rxjs/operators';
+import {addIdToMessage} from '../chat.utils';
 
 export const loadAnswer = createEffect(
   (actions$ = inject(Actions), chatService = inject(ChatService)) => {
@@ -12,7 +13,7 @@ export const loadAnswer = createEffect(
       concatMap(({requestData}) => chatService.postQuestion(requestData)),
       map((response) => {
         const message = response.choices[0].message;
-        return addChatMessageAction({message});
+        return addChatMessageAction({message: addIdToMessage(message)});
       }),
       catchError((error: {message: string}) => of(chatAnswerFailed())),
     );

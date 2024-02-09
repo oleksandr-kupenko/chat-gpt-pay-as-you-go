@@ -22,6 +22,7 @@ import {MessagesComponent} from './components/messages/messages.component';
 import {ActivatedRoute, NavigationExtras, Router} from '@angular/router';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {ChatsListComponent} from './components/chats-list/chats-list.component';
+import {removeMessageId} from './chat.utils';
 
 @Component({
   selector: 'app-chat',
@@ -77,11 +78,13 @@ export class ChatComponent implements OnInit {
     this.getCurrentChatId();
     this.store.dispatch(initChatAction({id: this.currentChatId}));
     this.initForm();
-    this.store.pipe(select(currentChatSelector(this.currentChatId))).subscribe((chat) => {
-      if (chat?.messages) {
-        this.messages.set(chat?.messages);
-      }
-    });
+    this.subs.add(
+      this.store.pipe(select(currentChatSelector(this.currentChatId))).subscribe((chat) => {
+        if (chat?.messages) {
+          this.messages.set(chat?.messages.ids.map((id) => chat?.messages.entities[id] as Message));
+        }
+      }),
+    );
   }
 
   public handleResize(event: any) {
@@ -101,10 +104,10 @@ export class ChatComponent implements OnInit {
     if (this.chatForm.valid) {
       this.isLoading.set(true);
       const model = this.chatForm.value.model.value;
-      const message: Message = {role: ROLE.user, content: convertToHtml(this.chatForm.value.question)};
+      const message: Message = {role: ROLE.user, content: convertToHtml(this.chatForm.value.question), id: createId()};
       this.chatForm.patchValue({question: ''});
       this.store.dispatch(addChatMessageAction({message}));
-      this.store.dispatch(getAnswerAction({requestData: {model, messages: this.messages()}}));
+      this.store.dispatch(getAnswerAction({requestData: {model, messages: removeMessageId(this.messages())}}));
 
       // this.chatService
       //   .postQuestion({model, messages: this.messages()})
