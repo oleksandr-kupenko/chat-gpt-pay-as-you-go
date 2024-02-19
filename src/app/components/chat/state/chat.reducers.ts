@@ -1,7 +1,13 @@
 import {Chat, ChatEntities, GPT_MODEL, Message} from '../../../app.interface';
-import {createReducer, on} from '@ngrx/store';
-import {addChatMessageAction, changeChatModelAction, createNewChatAction, initChatAction} from './chat.actions';
-import {createId} from '../../../utils';
+import {createReducer, on, Store} from '@ngrx/store';
+import {
+  addChatMessageAction,
+  changeChatModelAction,
+  createNewChatAction,
+  deleteChatAction,
+  initChatsAction,
+  initCurrentChatAction,
+} from './chat.actions';
 import {createEmptyChat} from '../chat.utils';
 import {createEntityAdapter, EntityAdapter} from '@ngrx/entity';
 
@@ -15,29 +21,27 @@ export const messagesAdapter: EntityAdapter<Message> = createEntityAdapter<Messa
 export const chatAdapter: EntityAdapter<Chat> = createEntityAdapter<Chat>();
 
 export const initialChatState: ChatState = {
-  currentChatId: createId(),
+  currentChatId: 'new',
   lastSelectedModel: GPT_MODEL.GPT_35,
   chats: chatAdapter.getInitialState(),
 };
 
 export const chatReducers = createReducer(
   initialChatState,
-  on(initChatAction, (state, {id}) => {
-    const foundedChat = chatAdapter.getSelectors().selectEntities(state.chats)[id];
+  on(initChatsAction, (state, {lastSelectedModel, chats}) => {
+    return {...state, chats: chats, lastSelectedModel};
+  }),
+  on(initCurrentChatAction, (state, {id}) => {
     let updatedChats: Chat[] = [...chatAdapter.getSelectors().selectAll(state.chats)];
-
-    if (!foundedChat) {
-      const newChat: Chat = createEmptyChat(id, state.lastSelectedModel);
-      updatedChats = [newChat, ...updatedChats];
-    }
-
     return {...state, currentChatId: id, chats: chatAdapter.upsertMany(updatedChats, state.chats)};
   }),
-  on(createNewChatAction, (state) => {
-    const newChatId = createId();
-    const newChat = createEmptyChat(newChatId, state.lastSelectedModel);
+  on(createNewChatAction, (state, {id}) => {
+    const newChat = createEmptyChat(id, state.lastSelectedModel);
 
-    return {...state, currentChatId: newChatId, chats: chatAdapter.addOne(newChat, state.chats)};
+    return {...state, currentChatId: id, chats: chatAdapter.addOne(newChat, state.chats)};
+  }),
+  on(deleteChatAction, (state, {id}) => {
+    return {...state, currentChatId: id, chats: chatAdapter.removeOne(id, state.chats)};
   }),
   on(addChatMessageAction, (state, {message}) => {
     const currentChat = state.chats.entities[state.currentChatId];
@@ -48,7 +52,6 @@ export const chatReducers = createReducer(
         ...currentChat,
         messages: updatedMessages,
       };
-
       return {
         ...state,
         chats: chatAdapter.updateOne({id: state.currentChatId, changes: updatedChat}, state.chats),

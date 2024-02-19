@@ -1,21 +1,47 @@
 import {Actions, createEffect, ofType} from '@ngrx/effects';
 import {inject} from '@angular/core';
 import {ChatService} from '../chat.service';
-import {addChatMessageAction, chatAnswerFailed, chatAnswerLoaded, getAnswerAction} from './chat.actions';
-import {concatMap, map, of} from 'rxjs';
+import {
+  addChatMessageAction,
+  chatAnswerFailedAction,
+  chatsSavedAction,
+  deleteChatAction,
+  getAnswerAction,
+} from './chat.actions';
+import {concatMap, map, of, withLatestFrom} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {addIdToMessage} from '../chat.utils';
+import {AppService} from '../../../app.service';
+import {Store} from '@ngrx/store';
+import {transformStateToConfig} from '../../../utils';
 
 export const loadAnswer = createEffect(
-  (actions$ = inject(Actions), chatService = inject(ChatService)) => {
+  (actions$ = inject(Actions), chatService = inject(ChatService), store = inject(Store)) => {
     return actions$.pipe(
       ofType(getAnswerAction),
-      concatMap(({requestData}) => chatService.postQuestion(requestData)),
+      concatMap(({requestData}) => {
+        return chatService.postQuestion(requestData);
+      }),
       map((response) => {
         const message = response.choices[0].message;
+        store.dispatch(chatsSavedAction());
         return addChatMessageAction({message: addIdToMessage(message)});
       }),
-      catchError((error: {message: string}) => of(chatAnswerFailed())),
+      catchError((error: {message: string}) => of(chatAnswerFailedAction())),
+    );
+  },
+  {functional: true},
+);
+
+export const saveChats = createEffect(
+  (actions$ = inject(Actions), appService = inject(AppService), store = inject(Store)) => {
+    return actions$.pipe(
+      ofType(addChatMessageAction, deleteChatAction),
+      withLatestFrom(store),
+      concatMap(([action, state]) => appService.saveChats(transformStateToConfig(state))),
+      map((response) => {
+        return chatsSavedAction();
+      }),
     );
   },
   {functional: true},

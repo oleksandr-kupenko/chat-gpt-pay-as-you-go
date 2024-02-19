@@ -1,28 +1,34 @@
-<div class="chats container d-flex flex-column pt-4 pb4 ps-2">
+<div class="chats container d-flex flex-column pt-4 pb4 ps-2 overflow-auto">
   @if (isShowCloseBtn) {
     <button class="icon-btn light ms-auto">
       <mat-icon (click)="this.closeChatsList.emit()">close</mat-icon>
     </button>
   }
 
-  <button class="list-btn list-btn-main row-cols-12">
+  <button [routerLink]="['/', 'chat']" class="list-btn list-btn-main row-cols-12">
     <mat-icon class="list-btn__main-icon" svgIcon="chat-gpt"></mat-icon>
     <span class="list-btn__title">New chat</span>
     <mat-icon class="list-btn__additional-icon" svgIcon="edit"></mat-icon>
   </button>
 
   <nav class="mt-4">
-    <ul class="chats__list">
-      @for (chat of chatsList(); track chatsList()) {
-        <li class="list-btn d-flex justify-content-between">
-          <div>
-            <a href=""> {{ chat.name }}</a>
-          </div>
-          <div class="chats__list--buttons d-flex">
-            <button><mat-icon class="list-btn__additional-icon">more_horiz</mat-icon></button>
-          </div>
-        </li>
+    <div class="chats__list">
+      @for (chat of chatsList$ | async; track chatsList$) {
+        @if (chat.id !== 'new') {
+          <a [routerLink]="['/', 'chat', chat.id]" class="list-btn d-flex justify-content-between">
+            {{ chat.id }}
+            <div class="chats__list--buttons d-flex" (click)="$event.stopPropagation()">
+              <button [matMenuTriggerFor]="menu" (click)="$event.preventDefault(); setCurrentChangedChatId(chat.id)">
+                <mat-icon class="list-btn__additional-icon">more_horiz</mat-icon>
+              </button>
+            </div>
+          </a>
+        }
       }
-    </ul>
+    </div>
   </nav>
 </div>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="handleRenameChat()">Rename</button>
+  <button mat-menu-item class="text-danger" (click)="handleDeleteChat()">Delete chat</button>
+</mat-menu>

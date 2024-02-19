@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {CHAT_KEY, GPT_MODEL, Message, RequestData, ResponseData, State, STATE_KEY} from './app.interface';
-import {BehaviorSubject} from 'rxjs';
+import {API_KEY, CONFIG, Config, State} from './app.interface';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class AppService {
@@ -15,12 +15,12 @@ export class AppService {
   }
 
   saveKey(apiKey: string) {
-    localStorage.setItem(CHAT_KEY, apiKey);
+    localStorage.setItem(API_KEY, apiKey);
     this.setKey(apiKey);
   }
 
   public initKey() {
-    const savedKey = localStorage.getItem(CHAT_KEY);
+    const savedKey = localStorage.getItem(API_KEY);
     this.apiKey$$.next(savedKey);
   }
 
@@ -29,20 +29,30 @@ export class AppService {
   }
 
   public deleteKey() {
-    localStorage.removeItem(CHAT_KEY);
+    localStorage.removeItem(API_KEY);
     this.apiKey$$.next('');
   }
 
   public initState() {
-    const savedState = localStorage.getItem(STATE_KEY);
+    const savedState = localStorage.getItem(API_KEY);
     if (savedState) {
     } else {
       this.state$$.next(new State());
     }
   }
 
-  public saveConfig(state: State) {
-    this.state$$.next(state);
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  public saveChats(config: Config) {
+    console.log('DATA', config);
+    localStorage.setItem(CONFIG, JSON.stringify(config));
+    return of({test: '123'});
+  }
+
+  public initConfig(): Observable<Config | null> {
+    const configStr = localStorage.getItem(CONFIG);
+    if (configStr) {
+      const config = JSON.parse(configStr) as Config | null;
+      return of(config);
+    }
+    return of(null);
   }
 }

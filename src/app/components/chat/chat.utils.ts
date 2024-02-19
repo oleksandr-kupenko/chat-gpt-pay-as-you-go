@@ -1,6 +1,6 @@
-import {Chat, GPT_MODEL, Message, MessageWithoutId} from '../../app.interface';
+import {Chat, ChatEntities, ChatWithMessagesArr, GPT_MODEL, Message, MessageWithoutId} from '../../app.interface';
 import {createId} from '../../utils';
-import {messagesAdapter} from './state/chat.reducers';
+import {chatAdapter, messagesAdapter} from './state/chat.reducers';
 
 export const createEmptyChat = (id?: string, model?: GPT_MODEL | string): Chat => {
   return {
@@ -19,4 +19,24 @@ export const addIdToMessage = (message: MessageWithoutId): Message => {
 
 export const removeMessageId = (messages: Message[]): MessageWithoutId[] => {
   return messages.map(({id, ...rest}) => ({...rest}));
+};
+
+export const transformChatsToChatsState = (
+  chatsWithMessages: ChatWithMessagesArr[] | undefined | undefined[],
+): ChatEntities => {
+  const isChatWithMessagesArr = (
+    src: ChatWithMessagesArr[] | undefined | undefined[],
+  ): src is ChatWithMessagesArr[] => {
+    return !!src && src.length != null && src.every((c) => c?.messages);
+  };
+
+  if (isChatWithMessagesArr(chatsWithMessages)) {
+    const chats: Chat[] = chatsWithMessages.map((chatWithMessages) => ({
+      ...chatWithMessages,
+      messages: messagesAdapter.setAll(chatWithMessages.messages, messagesAdapter.getInitialState()),
+    })) as Chat[];
+    return chatAdapter.setAll(chats, chatAdapter.getInitialState());
+  } else {
+    return chatAdapter.getInitialState();
+  }
 };

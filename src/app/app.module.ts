@@ -22,6 +22,8 @@ import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {chatFeatureKey, chatReducers} from './components/chat/state/chat.reducers';
 import {EffectsModule} from '@ngrx/effects';
 import * as chatEffects from './components/chat/state/chat.effects';
+import * as appEffects from './state/app.effects';
+import {appFeatureKey, appReducers} from './state/app.reducers';
 
 @NgModule({
   declarations: [AppComponent],
@@ -44,10 +46,10 @@ import * as chatEffects from './components/chat/state/chat.effects';
     // StoreModule.forRoot(reducers, {
     //   metaReducers,
     // }),
-    StoreModule.forRoot({[chatFeatureKey]: chatReducers}),
+    StoreModule.forRoot({[chatFeatureKey]: chatReducers, [appFeatureKey]: appReducers}),
     StoreModule.forFeature(chatFeatureKey, chatReducers),
     StoreDevtoolsModule.instrument({maxAge: 25, logOnly: !isDevMode()}),
-    EffectsModule.forRoot(chatEffects),
+    EffectsModule.forRoot(chatEffects, appEffects),
   ],
   providers: [
     {

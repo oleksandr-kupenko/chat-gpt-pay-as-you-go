@@ -1,4 +1,4 @@
-import {Component, OnInit, signal, WritableSignal} from '@angular/core';
+import {Component, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {Chat, GPT_MODEL, Message, ROLE} from '../../app.interface';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
@@ -9,13 +9,19 @@ import {MatOptionModule} from '@angular/material/core';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSelectModule} from '@angular/material/select';
 import {TextFieldModule} from '@angular/cdk/text-field';
-import {Observable, of, Subscription, tap} from 'rxjs';
+import {Observable, of, Subscription, switchMap, tap} from 'rxjs';
 import {SettingsBtnComponent} from '../../shared/components/settings-btn/settings-btn.component';
 import {convertToHtml, createId} from '../../utils';
 import {SafeMarkedPipe} from '../../shared/pipes/marked.pipe';
 import {HttpClientModule} from '@angular/common/http';
 import {select, Store} from '@ngrx/store';
-import {changeChatModelAction, initChatAction, addChatMessageAction, getAnswerAction} from './state/chat.actions';
+import {
+  changeChatModelAction,
+  initCurrentChatAction,
+  addChatMessageAction,
+  getAnswerAction,
+  createNewChatAction,
+} from './state/chat.actions';
 import {currentChatSelector} from './state/chat.selectors';
 import {AsyncPipe} from '@angular/common';
 import {MessagesComponent} from './components/messages/messages.component';
@@ -49,7 +55,7 @@ import {removeMessageId} from './chat.utils';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
   public isLoading = signal(false);
   public isShowChatsListBtn = signal(true);
   public messages: WritableSignal<Message[]> = signal([]);
@@ -65,6 +71,7 @@ export class ChatComponent implements OnInit {
   private windowWidth = window.innerWidth;
 
   private subs = new Subscription();
+  private currentMessagesSub?: Subscription;
 
   constructor(
     private store: Store,
@@ -74,17 +81,28 @@ export class ChatComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const chatResolverData = this.route.snapshot.data;
+    if (chatResolverData) {
+    }
+
     this.checkNeedShowChatListBtn();
     this.getCurrentChatId();
-    this.store.dispatch(initChatAction({id: this.currentChatId}));
     this.initForm();
-    this.subs.add(
-      this.store.pipe(select(currentChatSelector(this.currentChatId))).subscribe((chat) => {
-        if (chat?.messages) {
-          this.messages.set(chat?.messages.ids.map((id) => chat?.messages.entities[id] as Message));
-        }
-      }),
-    );
+    if (this.currentChatId) {
+      this.getCurrentChatId();
+    } else {
+      const id = 'new';
+      this.currentChatId = id;
+      this.store.dispatch(createNewChatAction({id}));
+      this.store.dispatch(initCurrentChatAction({id}));
+      this.getCurrentChatId();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.currentMessagesSub) {
+      this.currentMessagesSub.unsubscribe();
+    }
   }
 
   public handleResize(event: any) {
@@ -102,12 +120,23 @@ export class ChatComponent implements OnInit {
 
   public handleSend() {
     if (this.chatForm.valid) {
+      if (!this.currentChatId) {
+        const id = createId();
+        this.store.dispatch(createNewChatAction({id}));
+        this.redirectToNewChat(id);
+        this.store.dispatch(initCurrentChatAction({id}));
+      }
+
       this.isLoading.set(true);
-      const model = this.chatForm.value.model.value;
+
       const message: Message = {role: ROLE.user, content: convertToHtml(this.chatForm.value.question), id: createId()};
       this.chatForm.patchValue({question: ''});
       this.store.dispatch(addChatMessageAction({message}));
-      this.store.dispatch(getAnswerAction({requestData: {model, messages: removeMessageId(this.messages())}}));
+
+      const model = this.chatForm.value.model.value;
+      this.store.dispatch(
+        getAnswerAction({requestData: {model, messages: removeMessageId([...this.messages(), message])}}),
+      );
 
       // this.chatService
       //   .postQuestion({model, messages: this.messages()})
@@ -145,15 +174,24 @@ export class ChatComponent implements OnInit {
   }
 
   private getCurrentChatId() {
+    this.route.params
+      .pipe(
+        switchMap((params) => {
+          this.currentChatId = params['id'];
+          return this.store.select(currentChatSelector(this.currentChatId));
+        }),
+      )
+      .subscribe((chat) => {
+        if (!chat) {
+          this.router.navigate(['/chat']);
+        } else {
+          this.messages.set(chat?.messages.ids.map((id) => chat?.messages.entities[id] as Message));
+        }
+      });
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id != null) {
       this.currentChatId = id;
-    } else {
-      this.currentChatId = createId();
-      const navigationExtras: NavigationExtras = {
-        queryParams: {id},
-      };
-      this.router.navigate([], navigationExtras);
     }
   }
 
@@ -162,4 +200,16 @@ export class ChatComponent implements OnInit {
     this.isShowChatsListBtn.set(this.windowWidth < 576);
     console.log();
   }
+
+  private redirectToNewChat(id: string) {
+    this.router.navigate(['/chat', id]);
+  }
+
+  // private scrollToLastMessage() {
+  //   this.messageElList.last.nativeElement.scrollIntoView({
+  //     behavior: 'smooth',
+  //     block: 'end',
+  //     inline: 'nearest',
+  //   });
+  // }
 }

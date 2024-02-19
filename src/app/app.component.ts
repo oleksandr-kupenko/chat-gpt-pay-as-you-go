@@ -13,6 +13,10 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AppService} from './app.service';
 import {Observable, Subscription} from 'rxjs';
 import {SettingsMenuService} from './shared/services/settings-menu.service';
+import {select, Store} from '@ngrx/store';
+import {initConfigAction} from './state/app.actions';
+import {Config} from './app.interface';
+import {configSelector} from './state/app.selectors';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +26,8 @@ import {SettingsMenuService} from './shared/services/settings-menu.service';
 })
 export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('keyInputRef') keyInputEl!: ElementRef;
+
+  public config$!: Observable<Config | null>;
 
   public isLoading = signal(false);
   public settingsForm!: FormGroup;
@@ -37,9 +43,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private appService: AppService,
     private settingsBtnService: SettingsMenuService,
+    private store: Store,
   ) {}
 
   ngOnInit() {
+    this.store.dispatch(initConfigAction());
+    this.config$ = this.store.pipe(select(configSelector));
+
     this.initApiKey();
     this.initSettingsForm();
     this.subscribeToIsSettingsOpen();
