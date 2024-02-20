@@ -24,6 +24,7 @@ import {EffectsModule} from '@ngrx/effects';
 import * as chatEffects from './components/chat/state/chat.effects';
 import * as appEffects from './state/app.effects';
 import {appFeatureKey, appReducers} from './state/app.reducers';
+import {BackdropDirective} from './shared/directives/backdrop.directive';
 
 @NgModule({
   declarations: [AppComponent],

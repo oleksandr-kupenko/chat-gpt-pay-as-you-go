@@ -14,6 +14,14 @@ export const chatNotFound = createAction('[Chat Page] Chat Not Found');
 
 export const createNewChatAction = createAction('[Chat Page] Create new chat', props<{id: string}>());
 export const deleteChatAction = createAction('[Chat Page] Delete chat', props<{id: string}>());
+export const editChatNameAction = createAction(
+  '[Chat Page] Edit chat name',
+  props<{id: string; isEditable: boolean}>(),
+);
+export const saveNewChatNameAction = createAction(
+  '[Chat Page] Save new chat name',
+  props<{id: string; newName: string}>(),
+);
 
 export const chatAnswerLoadedAction = createAction('[Chat Page] Answer Loaded');
 export const chatAnswerFailedAction = createAction('[Chat Page] Answer Failed');

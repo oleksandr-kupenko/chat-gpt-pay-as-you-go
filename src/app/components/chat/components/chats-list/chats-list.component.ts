@@ -7,12 +7,15 @@ import {chatsListSelector} from '../../state/chat.selectors';
 import {AsyncPipe} from '@angular/common';
 import {Router, RouterModule} from '@angular/router';
 import {MatMenuModule} from '@angular/material/menu';
-import {deleteChatAction} from '../../state/chat.actions';
+import {deleteChatAction, editChatNameAction, saveNewChatNameAction} from '../../state/chat.actions';
+import {BackdropDirective} from '../../../../shared/directives/backdrop.directive';
+import {FormsModule} from '@angular/forms';
+import {AutoFocusDirective} from '../../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-chats-list',
   standalone: true,
-  imports: [MatIconModule, AsyncPipe, RouterModule, MatMenuModule],
+  imports: [MatIconModule, AsyncPipe, RouterModule, MatMenuModule, BackdropDirective, FormsModule, AutoFocusDirective],
   templateUrl: './chats-list.component.html',
   styleUrl: './chats-list.component.scss',
 })
@@ -21,6 +24,9 @@ export class ChatsListComponent implements OnInit {
   @Input() isShowCloseBtn = false;
 
   public chatsList$!: Observable<Chat[]>;
+
+  public editedNewName?: string | null;
+  private prevEditedName?: string | null;
 
   private currentChangedChatId: string | null = null;
 
@@ -38,15 +44,34 @@ export class ChatsListComponent implements OnInit {
     );
   }
 
-  public setCurrentChangedChatId(id: string) {
+  public setEditedChatData(id: string, name: string) {
+    if (this.editedNewName) {
+      this.handleCloseEditNameMode();
+    }
+
     this.currentChangedChatId = id;
+    this.prevEditedName = this.editedNewName = name;
   }
 
   public handleRenameChat() {
     console.log(this.currentChangedChatId);
+    this.store.dispatch(editChatNameAction({id: this.currentChangedChatId as string, isEditable: true}));
   }
 
   public handleDeleteChat() {
     this.store.dispatch(deleteChatAction({id: this.currentChangedChatId as string}));
+  }
+
+  public handleCloseEditNameMode() {
+    console.log('ok');
+    if (this.editedNewName && this.editedNewName !== this.prevEditedName) {
+      this.store.dispatch(
+        saveNewChatNameAction({id: this.currentChangedChatId as string, newName: this.editedNewName}),
+      );
+    } else {
+      this.store.dispatch(editChatNameAction({id: this.currentChangedChatId as string, isEditable: false}));
+    }
+    this.editedNewName = null;
+    this.prevEditedName = null;
   }
 }

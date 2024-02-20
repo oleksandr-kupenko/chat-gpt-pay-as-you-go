@@ -5,11 +5,13 @@ import {
   changeChatModelAction,
   createNewChatAction,
   deleteChatAction,
+  editChatNameAction,
   initChatsAction,
   initCurrentChatAction,
+  saveNewChatNameAction,
 } from './chat.actions';
-import {createEmptyChat} from '../chat.utils';
-import {createEntityAdapter, EntityAdapter} from '@ngrx/entity';
+import {createChatNameFromAnswer, createEmptyChat} from '../chat.utils';
+import {createEntityAdapter, EntityAdapter, Update} from '@ngrx/entity';
 
 export interface ChatState {
   currentChatId: string;
@@ -21,7 +23,7 @@ export const messagesAdapter: EntityAdapter<Message> = createEntityAdapter<Messa
 export const chatAdapter: EntityAdapter<Chat> = createEntityAdapter<Chat>();
 
 export const initialChatState: ChatState = {
-  currentChatId: 'new',
+  currentChatId: '',
   lastSelectedModel: GPT_MODEL.GPT_35,
   chats: chatAdapter.getInitialState(),
 };
@@ -37,8 +39,33 @@ export const chatReducers = createReducer(
   }),
   on(createNewChatAction, (state, {id}) => {
     const newChat = createEmptyChat(id, state.lastSelectedModel);
-
     return {...state, currentChatId: id, chats: chatAdapter.addOne(newChat, state.chats)};
+  }),
+  on(editChatNameAction, (state, {id, isEditable}) => {
+    const chatToUpdate = state.chats.entities[id];
+    const updatedChat: Update<Chat> = {
+      id,
+      changes: {
+        ...chatToUpdate,
+        isEditableName: isEditable,
+      },
+    };
+    const updatedChatsState = chatAdapter.updateOne(updatedChat, state.chats);
+    return {...state, chats: updatedChatsState};
+  }),
+  on(saveNewChatNameAction, (state, {id, newName}) => {
+    const chatToUpdate = state.chats.entities[id];
+    const updatedChat: Update<Chat> = {
+      id,
+      changes: {
+        ...chatToUpdate,
+        isEditableName: false,
+        name: newName,
+        isRenamed: true,
+      },
+    };
+    const updatedChatsState = chatAdapter.updateOne(updatedChat, state.chats);
+    return {...state, chats: updatedChatsState};
   }),
   on(deleteChatAction, (state, {id}) => {
     return {...state, currentChatId: id, chats: chatAdapter.removeOne(id, state.chats)};
@@ -51,7 +78,12 @@ export const chatReducers = createReducer(
       const updatedChat: Chat = {
         ...currentChat,
         messages: updatedMessages,
+        name:
+          !currentChat.isRenamed && updatedMessages.ids.length === 2
+            ? createChatNameFromAnswer(message.content)
+            : currentChat.name,
       };
+
       return {
         ...state,
         chats: chatAdapter.updateOne({id: state.currentChatId, changes: updatedChat}, state.chats),

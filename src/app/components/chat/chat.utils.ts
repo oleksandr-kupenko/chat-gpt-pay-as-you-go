@@ -40,3 +40,16 @@ export const transformChatsToChatsState = (
     return chatAdapter.getInitialState();
   }
 };
+
+export const createChatNameFromAnswer = (answer: string) => {
+  let answerWithoutHTML = answer.replace(/<[^>]*>/g, '');
+  const substring = answerWithoutHTML.substring(0, 30);
+  let lastIndex = Math.max(substring.lastIndexOf(' '), substring.lastIndexOf(','), substring.lastIndexOf('.'));
+
+  lastIndex = lastIndex === -1 ? substring.length : lastIndex;
+
+  const resultSubstring = substring.substring(0, lastIndex);
+  console.log(resultSubstring);
+
+  return resultSubstring;
+};

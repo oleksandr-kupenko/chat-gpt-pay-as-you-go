@@ -46,6 +46,8 @@ export interface Chat {
   tokens: number;
   model: GPT_MODEL | string;
   created: number;
+  isEditableName?: boolean;
+  isRenamed?: boolean;
 }
 
 export interface ChatWithMessagesArr extends Omit<Chat, 'messages'> {

@@ -9,7 +9,7 @@ import {MatOptionModule} from '@angular/material/core';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSelectModule} from '@angular/material/select';
 import {TextFieldModule} from '@angular/cdk/text-field';
-import {Observable, of, Subscription, switchMap, tap} from 'rxjs';
+import {Observable, of, Subscription, switchMap, take, tap} from 'rxjs';
 import {SettingsBtnComponent} from '../../shared/components/settings-btn/settings-btn.component';
 import {convertToHtml, createId} from '../../utils';
 import {SafeMarkedPipe} from '../../shared/pipes/marked.pipe';
@@ -81,22 +81,14 @@ export class ChatComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    console.log('init');
     const chatResolverData = this.route.snapshot.data;
     if (chatResolverData) {
     }
 
     this.checkNeedShowChatListBtn();
-    this.getCurrentChatId();
     this.initForm();
-    if (this.currentChatId) {
-      this.getCurrentChatId();
-    } else {
-      const id = 'new';
-      this.currentChatId = id;
-      this.store.dispatch(createNewChatAction({id}));
-      this.store.dispatch(initCurrentChatAction({id}));
-      this.getCurrentChatId();
-    }
+    this.subscribeToRouteChanges();
   }
 
   ngOnDestroy() {
@@ -137,26 +129,6 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.store.dispatch(
         getAnswerAction({requestData: {model, messages: removeMessageId([...this.messages(), message])}}),
       );
-
-      // this.chatService
-      //   .postQuestion({model, messages: this.messages()})
-      //   .pipe(finalize(() => this.isLoading.set(false)))
-      //   .subscribe({
-      //     next: (data) => {
-      //       this.messages.update((list) => [...list, data.choices[0].message]);
-      //     },
-      //     error: () => {
-      //       this.messages.update((list) => {
-      //         this.chatForm.patchValue({question: list.pop()?.content});
-      //         this.messageElList.last.nativeElement.scrollIntoView({
-      //           behavior: 'smooth',
-      //           block: 'end',
-      //           inline: 'nearest',
-      //         });
-      //         return list;
-      //       });
-      //     },
-      //   });
       this.isLoading.set(false);
     }
   }
@@ -173,43 +145,40 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getCurrentChatId() {
-    this.route.params
-      .pipe(
-        switchMap((params) => {
-          this.currentChatId = params['id'];
-          return this.store.select(currentChatSelector(this.currentChatId));
+  private subscribeToRouteChanges() {
+    this.subs.add(
+      this.route.params
+        .pipe(
+          switchMap((params) => {
+            this.currentChatId = params['id'];
+            if (this.currentChatId) {
+              this.store.dispatch(initCurrentChatAction({id: this.currentChatId}));
+              return this.store.select(currentChatSelector(this.currentChatId));
+            } else {
+              return of(undefined);
+            }
+          }),
+        )
+        .subscribe((chat) => {
+          if (!chat) {
+            this.router.navigate(['/chat']);
+            const id = 'new';
+            this.currentChatId = id;
+            this.store.dispatch(createNewChatAction({id}));
+            this.store.dispatch(initCurrentChatAction({id}));
+          } else {
+            this.messages.set(chat?.messages.ids.map((id) => chat?.messages.entities[id] as Message));
+          }
         }),
-      )
-      .subscribe((chat) => {
-        if (!chat) {
-          this.router.navigate(['/chat']);
-        } else {
-          this.messages.set(chat?.messages.ids.map((id) => chat?.messages.entities[id] as Message));
-        }
-      });
-
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id != null) {
-      this.currentChatId = id;
-    }
+    );
   }
 
   private checkNeedShowChatListBtn() {
     this.isChatsListOpened.set(this.windowWidth > 576);
     this.isShowChatsListBtn.set(this.windowWidth < 576);
-    console.log();
   }
 
   private redirectToNewChat(id: string) {
     this.router.navigate(['/chat', id]);
   }
-
-  // private scrollToLastMessage() {
-  //   this.messageElList.last.nativeElement.scrollIntoView({
-  //     behavior: 'smooth',
-  //     block: 'end',
-  //     inline: 'nearest',
-  //   });
-  // }
 }

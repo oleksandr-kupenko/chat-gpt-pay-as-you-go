@@ -12,20 +12,36 @@
   </button>
 
   <nav class="mt-4">
-    <div class="chats__list">
+    <ul class="chats__list">
       @for (chat of chatsList$ | async; track chatsList$) {
         @if (chat.id !== 'new') {
-          <a [routerLink]="['/', 'chat', chat.id]" class="list-btn d-flex justify-content-between">
-            {{ chat.id }}
-            <div class="chats__list--buttons d-flex" (click)="$event.stopPropagation()">
-              <button [matMenuTriggerFor]="menu" (click)="$event.preventDefault(); setCurrentChangedChatId(chat.id)">
-                <mat-icon class="list-btn__additional-icon">more_horiz</mat-icon>
-              </button>
-            </div>
-          </a>
+          <li class="chats__list--element d-flex align-items-center">
+            @if (chat.isEditableName) {
+              <input
+                class="w-100"
+                appBackdrop
+                appAutoFocus
+                [backdropDelay]="100"
+                (clickOutside)="handleCloseEditNameMode()"
+                [(ngModel)]="editedNewName"
+              />
+            } @else {
+              <a [routerLink]="['/', 'chat', chat.id]" class="list-btn w-100 justify-content-between">
+                <span class="list-btn__title">{{ chat.name }}</span>
+                <div class="chats__list--buttons d-flex" (click)="$event.stopPropagation()">
+                  <button
+                    [matMenuTriggerFor]="menu"
+                    (click)="$event.preventDefault(); setEditedChatData(chat.id, chat.name)"
+                  >
+                    <mat-icon class="list-btn__additional-icon">more_horiz</mat-icon>
+                  </button>
+                </div>
+              </a>
+            }
+          </li>
         }
       }
-    </div>
+    </ul>
   </nav>
 </div>
 <mat-menu #menu="matMenu">
