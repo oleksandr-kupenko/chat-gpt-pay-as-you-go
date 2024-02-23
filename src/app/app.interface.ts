@@ -61,6 +61,8 @@ export interface Message {
   role: ROLE;
   content: string;
   id: string;
+  isEditable?: boolean;
+  isChanged?: boolean;
 }
 
 export interface MessageWithoutId extends Omit<Message, 'id'> {

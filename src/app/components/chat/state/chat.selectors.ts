@@ -16,3 +16,12 @@ export const chatStateSelector = createSelector(selectChatState, (chatState: Cha
 export const chatsListSelector = createSelector(selectChatState, (chatState: ChatState): Chat[] => {
   return Object.values(chatState.chats.entities ?? {}).filter((chat): chat is Chat => chat !== undefined);
 });
+
+export const someMessageEditedSelector = createSelector(selectChatState, (chatState: ChatState) => {
+  const currentChat = chatState.chats.entities[chatState.currentChatId];
+  if (currentChat) {
+    return Object.values(currentChat.messages.entities).some((message) => message?.isChanged);
+  } else {
+    return false;
+  }
+});

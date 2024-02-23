@@ -5,9 +5,12 @@ import {
   addChatMessageAction,
   chatAnswerFailedAction,
   chatsSavedAction,
+  clearMessagesUpdatedStatusAction,
   deleteChatAction,
+  deleteChatMessageAction,
   getAnswerAction,
   saveNewChatNameAction,
+  saveNewMessageAction,
 } from './chat.actions';
 import {concatMap, map, of, withLatestFrom} from 'rxjs';
 import {catchError} from 'rxjs/operators';
@@ -25,6 +28,7 @@ export const loadAnswer = createEffect(
       }),
       map((response) => {
         const message = response.choices[0].message;
+        store.dispatch(clearMessagesUpdatedStatusAction());
         store.dispatch(chatsSavedAction());
         return addChatMessageAction({message: addIdToMessage(message)});
       }),
@@ -37,7 +41,13 @@ export const loadAnswer = createEffect(
 export const saveChats = createEffect(
   (actions$ = inject(Actions), appService = inject(AppService), store = inject(Store)) => {
     return actions$.pipe(
-      ofType(addChatMessageAction, deleteChatAction, saveNewChatNameAction),
+      ofType(
+        addChatMessageAction,
+        deleteChatAction,
+        saveNewChatNameAction,
+        saveNewMessageAction,
+        deleteChatMessageAction,
+      ),
       withLatestFrom(store),
       concatMap(([action, state]) => appService.saveChats(transformStateToConfig(state))),
       map((response) => {

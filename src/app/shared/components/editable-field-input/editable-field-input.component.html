@@ -1,0 +1,19 @@
+@if (isTextArea) {
+  <textarea
+    class="w-100"
+    appAutoFocus
+    appBackdrop
+    [backdropDelay]="100"
+    (clickOutside)="handleSendNewText()"
+    [(ngModel)]="editedNewText"
+  ></textarea>
+} @else {
+  <input
+    class="w-100"
+    appAutoFocus
+    appBackdrop
+    [backdropDelay]="100"
+    (clickOutside)="handleSendNewText()"
+    [(ngModel)]="editedNewText"
+  />
+}

@@ -74,7 +74,7 @@ body {
       transition: $trs;
     }
 
-    &:hover {
+    &:hover, &.active {
       background-color: $very-dark-grey;
 
       .list-btn__additional-icon {

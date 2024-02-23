@@ -1,0 +1,17 @@
+@import 'core/variables';
+
+input, textarea {
+  padding-left: 0.5rem;;
+  background: $black-background;
+  color: $text-color;
+  border-color: $action_blue;
+  font-size: 0.875rem;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+input {
+  max-height: 1.5rem;
+}

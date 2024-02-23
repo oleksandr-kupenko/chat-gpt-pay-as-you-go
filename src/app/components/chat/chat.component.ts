@@ -9,7 +9,7 @@ import {MatOptionModule} from '@angular/material/core';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSelectModule} from '@angular/material/select';
 import {TextFieldModule} from '@angular/cdk/text-field';
-import {Observable, of, Subscription, switchMap, take, tap} from 'rxjs';
+import {Observable, of, Subscription, switchMap} from 'rxjs';
 import {SettingsBtnComponent} from '../../shared/components/settings-btn/settings-btn.component';
 import {convertToHtml, createId} from '../../utils';
 import {SafeMarkedPipe} from '../../shared/pipes/marked.pipe';
@@ -22,13 +22,15 @@ import {
   getAnswerAction,
   createNewChatAction,
 } from './state/chat.actions';
-import {currentChatSelector} from './state/chat.selectors';
+import {currentChatSelector, someMessageEditedSelector} from './state/chat.selectors';
 import {AsyncPipe} from '@angular/common';
 import {MessagesComponent} from './components/messages/messages.component';
 import {ActivatedRoute, NavigationExtras, Router} from '@angular/router';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {ChatsListComponent} from './components/chats-list/chats-list.component';
 import {removeMessageId} from './chat.utils';
+
+declare const hljs: any;
 
 @Component({
   selector: 'app-chat',
@@ -62,6 +64,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   public isChatsListOpened = signal(false);
 
+  public isSomeMessageUpdated$!: Observable<boolean>;
+
   protected readonly ROLE = ROLE;
 
   public chatForm!: FormGroup;
@@ -83,6 +87,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   ngOnInit() {
     console.log('init');
     const chatResolverData = this.route.snapshot.data;
+    this.isSomeMessageUpdated$ = this.store.pipe(select(someMessageEditedSelector));
     if (chatResolverData) {
     }
 
@@ -111,8 +116,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   public handleSend() {
+    const message: Message = {role: ROLE.user, content: this.chatForm.value.question, id: createId()};
+    const model = this.chatForm.value.model.value;
     if (this.chatForm.valid) {
-      if (!this.currentChatId) {
+      if (!this.currentChatId || this.currentChatId === 'new') {
         const id = createId();
         this.store.dispatch(createNewChatAction({id}));
         this.redirectToNewChat(id);
@@ -121,15 +128,15 @@ export class ChatComponent implements OnInit, OnDestroy {
 
       this.isLoading.set(true);
 
-      const message: Message = {role: ROLE.user, content: convertToHtml(this.chatForm.value.question), id: createId()};
       this.chatForm.patchValue({question: ''});
       this.store.dispatch(addChatMessageAction({message}));
 
-      const model = this.chatForm.value.model.value;
       this.store.dispatch(
         getAnswerAction({requestData: {model, messages: removeMessageId([...this.messages(), message])}}),
       );
       this.isLoading.set(false);
+    } else if (!this.chatForm.value.question) {
+      this.store.dispatch(getAnswerAction({requestData: {model, messages: removeMessageId([...this.messages()])}}));
     }
   }
 

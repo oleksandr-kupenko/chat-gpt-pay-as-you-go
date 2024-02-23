@@ -11,11 +11,21 @@ import {deleteChatAction, editChatNameAction, saveNewChatNameAction} from '../..
 import {BackdropDirective} from '../../../../shared/directives/backdrop.directive';
 import {FormsModule} from '@angular/forms';
 import {AutoFocusDirective} from '../../../../shared/directives/autofocus.directive';
+import {EditableFieldInputComponent} from '../../../../shared/components/editable-field-input/editable-field-input.component';
 
 @Component({
   selector: 'app-chats-list',
   standalone: true,
-  imports: [MatIconModule, AsyncPipe, RouterModule, MatMenuModule, BackdropDirective, FormsModule, AutoFocusDirective],
+  imports: [
+    MatIconModule,
+    AsyncPipe,
+    RouterModule,
+    MatMenuModule,
+    BackdropDirective,
+    FormsModule,
+    AutoFocusDirective,
+    EditableFieldInputComponent,
+  ],
   templateUrl: './chats-list.component.html',
   styleUrl: './chats-list.component.scss',
 })
@@ -25,15 +35,9 @@ export class ChatsListComponent implements OnInit {
 
   public chatsList$!: Observable<Chat[]>;
 
-  public editedNewName?: string | null;
-  private prevEditedName?: string | null;
-
   private currentChangedChatId: string | null = null;
 
-  constructor(
-    private store: Store,
-    private router: Router,
-  ) {}
+  constructor(private store: Store) {}
 
   ngOnInit() {
     this.chatsList$ = this.store.pipe(
@@ -44,34 +48,19 @@ export class ChatsListComponent implements OnInit {
     );
   }
 
-  public setEditedChatData(id: string, name: string) {
-    if (this.editedNewName) {
-      this.handleCloseEditNameMode();
-    }
-
-    this.currentChangedChatId = id;
-    this.prevEditedName = this.editedNewName = name;
+  public handleRenameChat(id: string) {
+    this.store.dispatch(editChatNameAction({id, isEditable: true}));
   }
 
-  public handleRenameChat() {
-    console.log(this.currentChangedChatId);
-    this.store.dispatch(editChatNameAction({id: this.currentChangedChatId as string, isEditable: true}));
+  public handleDeleteChat(id: string) {
+    this.store.dispatch(deleteChatAction({id}));
   }
 
-  public handleDeleteChat() {
-    this.store.dispatch(deleteChatAction({id: this.currentChangedChatId as string}));
-  }
-
-  public handleCloseEditNameMode() {
-    console.log('ok');
-    if (this.editedNewName && this.editedNewName !== this.prevEditedName) {
-      this.store.dispatch(
-        saveNewChatNameAction({id: this.currentChangedChatId as string, newName: this.editedNewName}),
-      );
+  public handleCloseEditNameMode(newText: {id: string; value: string | null; wasChanged: boolean}) {
+    if (newText.wasChanged) {
+      this.store.dispatch(saveNewChatNameAction({id: newText.id, newName: newText.value as string}));
     } else {
-      this.store.dispatch(editChatNameAction({id: this.currentChangedChatId as string, isEditable: false}));
+      this.store.dispatch(editChatNameAction({id: newText.id, isEditable: false}));
     }
-    this.editedNewName = null;
-    this.prevEditedName = null;
   }
 }

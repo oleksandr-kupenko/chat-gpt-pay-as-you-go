@@ -1,5 +1,9 @@
-@for (message of messages; track messages) {
-  <div #messageRef class="message-wrapper d-flex">
+@for (message of messages; track messages; let idx = $index) {
+  <div
+    #messageRef
+    class="list-btn message-wrapper d-flex position-relative"
+    [class.active]="idx === highlightedMessageIdx"
+  >
     <div class="d-flex">
       <div
         class="message__owner--icon d-flex justify-content-center align-items-center me-2"
@@ -14,7 +18,36 @@
     </div>
     <div class="message pb-4">
       <span class="message__owner d-flex text-white fw-bold text-capitalize">{{ message.role }}</span>
-      <div class="message__body" [innerHTML]="message.content | safeMarked"></div>
+      @if (message.isEditable) {
+        <app-editable-field-input
+          [isTextArea]="true"
+          [prevEditedText]="message.content"
+          [entityId]="message.id"
+          (onTextChanged)="handleCloseEditNameMode($event)"
+        ></app-editable-field-input>
+      } @else {
+        <div class="message__body" [innerHTML]="message.content | safeMarked"></div>
+      }
     </div>
+    @if (message.isChanged && !message.isEditable) {
+      <mat-icon class="message-status-icon" matTooltip="Changed">new_releases</mat-icon>
+    }
+
+    <button
+      type="button"
+      [matMenuTriggerFor]="menu"
+      [matMenuTriggerData]="{messageId: message.id}"
+      (menuOpened)="handleHighlightMessage(idx)"
+      (menuClosed)="cancelHighlightMessage()"
+    >
+      <mat-icon class="list-btn__additional-icon">more_horiz</mat-icon>
+    </button>
   </div>
 }
+
+<mat-menu #menu="matMenu">
+  <ng-template matMenuContent let-id="messageId">
+    <button mat-menu-item (click)="handleEditMessage(id)">Edit</button>
+    <button mat-menu-item (click)="handleDeleteMessage(id)" class="text-danger">Delete message</button>
+  </ng-template>
+</mat-menu>

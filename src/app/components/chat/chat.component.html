@@ -7,7 +7,7 @@
     <div class="header-settings d-flex justify-content-between mb-3">
       <div class="d-flex align-items-center col-10 col-sm-6 col-lg-3 col-xl-4 col-xxl-3">
         @if (isShowChatsListBtn()) {
-          <button class="me-4 icon-btn" (click)="handleToggleChatsList(true)">
+          <button type="button" class="me-4 icon-btn" (click)="handleToggleChatsList(true)">
             <mat-icon class="d-flex" svgIcon="navbar"></mat-icon>
           </button>
         }
@@ -46,7 +46,7 @@
       class="col-1 ms-auto"
       mat-raised-button
       color="primary"
-      [disabled]="isLoading() || !chatForm.value.question"
+      [disabled]="(isLoading() || !chatForm.value.question) && !(isSomeMessageUpdated$ | async)"
     >
       @if (isLoading()) {
         <mat-spinner [diameter]="25"></mat-spinner>
