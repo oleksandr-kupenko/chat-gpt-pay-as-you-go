@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Input,
@@ -20,12 +21,22 @@ import {EditableFieldInputComponent} from '../../../../shared/components/editabl
 import {deleteChatMessageAction, editMessageContentAction, saveNewMessageAction} from '../../state/chat.actions';
 import {Store} from '@ngrx/store';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {HighlightJsDirective, HighlightJsModule} from 'ngx-highlight-js';
 
 declare const hljs: any;
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [AsyncPipe, MatIconModule, SafeMarkedPipe, MatMenuModule, EditableFieldInputComponent, MatTooltipModule],
+  imports: [
+    AsyncPipe,
+    MatIconModule,
+    SafeMarkedPipe,
+    MatMenuModule,
+    EditableFieldInputComponent,
+    MatTooltipModule,
+    HighlightJsModule,
+    HighlightJsDirective,
+  ],
   templateUrl: './messages.component.html',
   styleUrl: './messages.component.scss',
 })
@@ -40,11 +51,14 @@ export class MessagesComponent implements AfterViewInit, OnDestroy, OnChanges {
 
   private subs = new Subscription();
 
-  constructor(private store: Store) {}
+  constructor(
+    private store: Store,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['messages'] && this.messages.length) {
-      hljs.highlightAll();
+    if (changes['messages']) {
+      console.log(111, this.messages);
     }
   }
 
@@ -83,11 +97,16 @@ export class MessagesComponent implements AfterViewInit, OnDestroy, OnChanges {
     hljs.highlightAll();
   }
 
+  public isContainCode(message: string) {
+    console.log(message);
+    console.log(message.includes('```'));
+    return message.includes('```');
+  }
+
   private subscribeToMessagesEl() {
     this.subs.add(
       this.messageElList.changes.subscribe(() => {
         this.messageElList.last?.nativeElement.scrollIntoView({behavior: 'smooth', block: 'end', inline: 'nearest'});
-        hljs.highlightAll();
       }),
     );
   }

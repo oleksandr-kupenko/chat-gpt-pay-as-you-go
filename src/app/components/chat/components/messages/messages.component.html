@@ -26,7 +26,13 @@
           (onTextChanged)="handleCloseEditNameMode($event)"
         ></app-editable-field-input>
       } @else {
-        <div class="message__body" [innerHTML]="message.content | safeMarked"></div>
+        @if (isContainCode(message.content)) {
+          <div highlight-js mode="default">
+            <div class="message__body" [innerHTML]="message.content | safeMarked"></div>
+          </div>
+        } @else {
+          <div class="message__body" [innerHTML]="message.content | safeMarked"></div>
+        }
       }
     </div>
     @if (message.isChanged && !message.isEditable) {
