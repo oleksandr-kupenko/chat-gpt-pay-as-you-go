@@ -4,15 +4,17 @@ import {MatOptionModule} from '@angular/material/core';
 import {MatSelectModule} from '@angular/material/select';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {Model} from '../../../../app.interface';
-import {changeChatModelAction} from '../../state/chat.actions';
+import {addNewModelAction, changeChatModelAction, deleteAddedModelAction} from '../../state/chat.actions';
 import {Store} from '@ngrx/store';
 import {AddNewModelModalComponent} from '../add-new-model-modal/add-new-model-modal.component';
 import {MatDialog} from '@angular/material/dialog';
+import {createId} from '../../../../utils';
+import {MatIconModule} from '@angular/material/icon';
 
 @Component({
   selector: 'app-model-select',
   standalone: true,
-  imports: [MatFormFieldModule, MatOptionModule, MatSelectModule, ReactiveFormsModule],
+  imports: [MatFormFieldModule, MatOptionModule, MatSelectModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './model-select.component.html',
   styleUrl: './model-select.component.scss',
 })
@@ -40,7 +42,6 @@ export class ModelSelectComponent implements OnChanges {
   }
 
   public handleModelChange() {
-    console.log(111, this.modelFormControl.value);
     this.store.dispatch(changeChatModelAction({modelId: this.modelFormControl.value.id}));
   }
 
@@ -48,8 +49,13 @@ export class ModelSelectComponent implements OnChanges {
     const dialogRef = this.dialog.open(AddNewModelModalComponent, {});
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        console.log('RESULT', result);
+        const newModel: Model = {model: result.model, name: result.name, isCustom: true, id: createId()};
+        this.store.dispatch(addNewModelAction({newModels: [newModel]}));
       }
     });
+  }
+
+  public handleDeleteModel(id: string) {
+    this.store.dispatch(deleteAddedModelAction({id}));
   }
 }

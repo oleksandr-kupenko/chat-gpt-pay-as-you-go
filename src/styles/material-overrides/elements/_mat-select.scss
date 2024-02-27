@@ -1,0 +1,14 @@
+.mat-mdc-option .mdc-list-item__primary-text {
+  display: flex;
+  width: 100%;
+}
+
+.body .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):not(.mat-mdc-option-multiple) {
+  position: relative;
+}
+
+.mat-mdc-select-trigger {
+  .delete-btn {
+    display: none;
+  }
+}

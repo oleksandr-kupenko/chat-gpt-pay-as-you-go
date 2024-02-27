@@ -1,0 +1,30 @@
+@import 'core/variables';
+
+.delete-btn {
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    right: 3px;
+    top: 0;
+    z-index: 99999;
+    color: white;
+    width: 15px;
+    height: 20px;
+    display: flex;
+
+    &:before {
+      content: 'x';
+      left: 0;
+      right: 0;
+      margin-left: auto;
+      margin-right: auto;
+      width: 5px;
+    }
+
+    &:hover {
+      &:before {
+        color: $alert_red;
+      }
+    }
+  }
+

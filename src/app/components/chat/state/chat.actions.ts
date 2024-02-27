@@ -1,9 +1,9 @@
 import {createAction, props} from '@ngrx/store';
-import {Chat, ChatEntities, Message, RequestData} from '../../../app.interface';
+import {Chat, ChatEntities, Message, Model, RequestData} from '../../../app.interface';
 
 export const initChatsAction = createAction(
   '[[Chat Page] Init Chats',
-  props<{lastSelectedModelId: string; chats: ChatEntities}>(),
+  props<{lastSelectedModelId: string; chats: ChatEntities; models: Model[]}>(),
 );
 export const initCurrentChatAction = createAction('[Chat Page] Init Current Chat', props<{id: string}>());
 export const addChatMessageAction = createAction('[Chat Page] Add Chat Message', props<{message: Message}>());
@@ -43,3 +43,7 @@ export const chatAnswerFailedAction = createAction('[Chat Page] Answer Failed');
 
 export const saveChatsAction = createAction('[Chat Page] Save Chats');
 export const chatsSavedAction = createAction('[Chat Page] Chats Saved Successful');
+
+export const addNewModelAction = createAction('[Chat Page] Add New Model', props<{newModels: Model[]}>());
+
+export const deleteAddedModelAction = createAction('[Chat Page] Delete Added Model', props<{id: string}>());

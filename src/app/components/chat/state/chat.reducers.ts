@@ -2,9 +2,11 @@ import {Chat, ChatEntities, Message, MessageEntities, Model, ROLE} from '../../.
 import {createReducer, on, Store} from '@ngrx/store';
 import {
   addChatMessageAction,
+  addNewModelAction,
   changeChatModelAction,
   clearMessagesUpdatedStatusAction,
   createNewChatAction,
+  deleteAddedModelAction,
   deleteChatAction,
   deleteChatMessageAction,
   editChatNameAction,
@@ -17,6 +19,7 @@ import {
 import {createChatNameFromAnswer, createEmptyChat} from '../chat.utils';
 import {createEntityAdapter, EntityAdapter, Update} from '@ngrx/entity';
 import {DEFAULT_MODELS} from '../chat.constants';
+import {filter} from 'rxjs';
 
 export interface ChatState {
   currentChatId: string;
@@ -37,8 +40,9 @@ export const initialChatState: ChatState = {
 
 export const chatReducers = createReducer(
   initialChatState,
-  on(initChatsAction, (state, {lastSelectedModelId, chats}) => {
-    return {...state, chats: chats, lastSelectedModelId};
+  on(initChatsAction, (state, {lastSelectedModelId, chats, models}) => {
+    const modelsList = models.length ? models : DEFAULT_MODELS;
+    return {...state, chats: chats, lastSelectedModelId, models: modelsList};
   }),
   on(initCurrentChatAction, (state, {id}) => {
     let updatedChats: Chat[] = [...chatAdapter.getSelectors().selectAll(state.chats)];
@@ -189,6 +193,18 @@ export const chatReducers = createReducer(
     return {
       ...state,
       lastSelectedModelId: modelId,
+    };
+  }),
+  on(addNewModelAction, (state, {newModels}) => {
+    return {
+      ...state,
+      models: [...state.models, ...newModels],
+    };
+  }),
+  on(deleteAddedModelAction, (state, {id}) => {
+    return {
+      ...state,
+      models: state.models.filter((model) => model.id !== id),
     };
   }),
 );

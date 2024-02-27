@@ -3,9 +3,11 @@ import {inject} from '@angular/core';
 import {ChatService} from '../chat.service';
 import {
   addChatMessageAction,
+  addNewModelAction,
   chatAnswerFailedAction,
   chatsSavedAction,
   clearMessagesUpdatedStatusAction,
+  deleteAddedModelAction,
   deleteChatAction,
   deleteChatMessageAction,
   getAnswerAction,
@@ -47,6 +49,8 @@ export const saveChats = createEffect(
         saveNewChatNameAction,
         saveNewMessageAction,
         deleteChatMessageAction,
+        addNewModelAction,
+        deleteAddedModelAction,
       ),
       withLatestFrom(store),
       concatMap(([action, state]) => appService.saveChats(transformStateToConfig(state))),

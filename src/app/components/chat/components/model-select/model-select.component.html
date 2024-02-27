@@ -2,7 +2,12 @@
   <mat-label>Model</mat-label>
   <mat-select [formControl]="modelFormControl" (selectionChange)="handleModelChange()">
     @for (model of models; track model) {
-      <mat-option [value]="model">{{ model.name }}</mat-option>
+      <mat-option [value]="model">
+        <span> {{ model.name }}</span>
+        @if (model?.isCustom) {
+          <button class="delete-btn" (click)="handleDeleteModel(model.id)"></button>
+        }
+      </mat-option>
     }
     <button class="btn btn-outline-secondary w-100" (click)="handleAddNewModel()">Add new</button>
   </mat-select>

@@ -25,6 +25,7 @@ export const ChatResolver = (route: ActivatedRouteSnapshot, state: RouterStateSn
               initChatsAction({
                 lastSelectedModelId: newData?.chat.lastSelectedModelId || DEFAULT_MODELS[0].id,
                 chats: transformChatsToChatsState(newData?.chat.chats as ChatWithMessagesArr[]),
+                models: newData?.chat.models || [],
               }),
             ),
           ),
