@@ -23,7 +23,11 @@
                 (onTextChanged)="handleCloseEditNameMode($event)"
               ></app-editable-field-input>
             } @else {
-              <a [routerLink]="['/', 'chat', chat.id]" class="list-btn w-100 justify-content-between">
+              <a
+                [routerLink]="['/', 'chat', chat.id]"
+                routerLinkActive="active"
+                class="list-btn w-100 justify-content-between"
+              >
                 <span class="list-btn__title">{{ chat.name }}</span>
                 <div class="chats__list--buttons d-flex" (click)="$event.stopPropagation()">
                   <button

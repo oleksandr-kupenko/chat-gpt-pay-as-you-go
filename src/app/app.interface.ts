@@ -2,9 +2,12 @@ import {EntityState} from '@ngrx/entity';
 
 export const API_KEY = 'chat_key';
 export const CONFIG = 'config';
-export enum GPT_MODEL {
-  GPT_35 = 'gpt-3.5-turbo',
-  GPT_4 = 'gpt-4-1106-preview',
+
+export interface Model {
+  id: string;
+  name: string;
+  model: string;
+  isCustom?: boolean;
 }
 
 export enum ROLE {
@@ -19,14 +22,6 @@ export class State {
   } = {
     rememberKey: false,
   };
-
-  chat: {
-    model: GPT_MODEL | string;
-    chats: Chat[];
-  } = {
-    model: GPT_MODEL.GPT_35,
-    chats: [],
-  };
 }
 
 export interface Config {
@@ -36,7 +31,8 @@ export interface Config {
 export interface ChatsConfig {
   chats: (ChatWithMessagesArr | undefined)[];
   currentChatId: string | null;
-  lastSelectedModel: GPT_MODEL | string | null;
+  lastSelectedModelId: string;
+  models: Model[];
 }
 
 export interface Chat {
@@ -44,7 +40,7 @@ export interface Chat {
   id: string;
   messages: MessageEntities;
   tokens: number;
-  model: GPT_MODEL | string;
+  modelId: string;
   created: number;
   isEditableName?: boolean;
   isRenamed?: boolean;
@@ -70,7 +66,7 @@ export interface MessageWithoutId extends Omit<Message, 'id'> {
 }
 
 export interface RequestData {
-  model: GPT_MODEL;
+  model: string;
   messages: MessageWithoutId[];
 }
 

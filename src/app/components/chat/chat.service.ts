@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Chat, GPT_MODEL, RequestData, ResponseData} from '../../app.interface';
+import {Chat, RequestData, ResponseData} from '../../app.interface';
 import {Observable, of} from 'rxjs';
 
 @Injectable({

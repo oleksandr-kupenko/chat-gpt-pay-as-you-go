@@ -6,7 +6,8 @@ import {AppService} from '../../app.service';
 import {chatStateSelector} from './state/chat.selectors';
 import {initChatsAction} from './state/chat.actions';
 import {transformChatsToChatsState} from './chat.utils';
-import {ChatWithMessagesArr, GPT_MODEL} from '../../app.interface';
+import {ChatWithMessagesArr} from '../../app.interface';
+import {DEFAULT_MODELS} from './chat.constants';
 
 export const ChatResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> => {
   const store = inject(Store);
@@ -22,7 +23,7 @@ export const ChatResolver = (route: ActivatedRouteSnapshot, state: RouterStateSn
           tap((newData) =>
             store.dispatch(
               initChatsAction({
-                lastSelectedModel: newData?.chat.lastSelectedModel || GPT_MODEL.GPT_35,
+                lastSelectedModelId: newData?.chat.lastSelectedModelId || DEFAULT_MODELS[0].id,
                 chats: transformChatsToChatsState(newData?.chat.chats as ChatWithMessagesArr[]),
               }),
             ),

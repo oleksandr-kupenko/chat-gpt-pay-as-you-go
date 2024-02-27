@@ -40,7 +40,7 @@ declare const hljs: any;
   templateUrl: './messages.component.html',
   styleUrl: './messages.component.scss',
 })
-export class MessagesComponent implements AfterViewInit, OnDestroy, OnChanges {
+export class MessagesComponent implements AfterViewInit, OnDestroy {
   @Input() messages!: Message[];
 
   @ViewChildren('messageRef') messageElList!: QueryList<ElementRef>;
@@ -55,12 +55,6 @@ export class MessagesComponent implements AfterViewInit, OnDestroy, OnChanges {
     private store: Store,
     private cdr: ChangeDetectorRef,
   ) {}
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['messages']) {
-      console.log(111, this.messages);
-    }
-  }
 
   ngAfterViewInit() {
     this.subscribeToMessagesEl();
@@ -80,10 +74,12 @@ export class MessagesComponent implements AfterViewInit, OnDestroy, OnChanges {
 
   public handleEditMessage(id: string) {
     this.store.dispatch(editMessageContentAction({id, isEditable: true}));
+    this.highlightedMessageIdx = null;
   }
 
   public handleDeleteMessage(id: string) {
     this.store.dispatch(deleteChatMessageAction({id}));
+    this.highlightedMessageIdx = null;
   }
 
   public handleCloseEditNameMode(newText: {id: string; value: string | null; wasChanged: boolean}) {
@@ -98,8 +94,6 @@ export class MessagesComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   public isContainCode(message: string) {
-    console.log(message);
-    console.log(message.includes('```'));
     return message.includes('```');
   }
 

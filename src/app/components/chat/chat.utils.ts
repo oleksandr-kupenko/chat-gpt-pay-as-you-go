@@ -1,11 +1,12 @@
-import {Chat, ChatEntities, ChatWithMessagesArr, GPT_MODEL, Message, MessageWithoutId} from '../../app.interface';
+import {Chat, ChatEntities, ChatWithMessagesArr, Message, MessageWithoutId, Model} from '../../app.interface';
 import {createId} from '../../utils';
 import {chatAdapter, messagesAdapter} from './state/chat.reducers';
+import {DEFAULT_MODELS} from './chat.constants';
 
-export const createEmptyChat = (id?: string, model?: GPT_MODEL | string): Chat => {
+export const createEmptyChat = (id?: string, modelId?: string): Chat => {
   return {
     id: id || createId(),
-    model: model || GPT_MODEL.GPT_35,
+    modelId: modelId || DEFAULT_MODELS[0].id,
     messages: messagesAdapter.getInitialState(),
     name: 'New chat',
     tokens: 0,

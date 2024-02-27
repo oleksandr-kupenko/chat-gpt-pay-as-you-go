@@ -1,4 +1,4 @@
-import {Chat, ChatEntities, GPT_MODEL, Message, MessageEntities, ROLE} from '../../../app.interface';
+import {Chat, ChatEntities, Message, MessageEntities, Model, ROLE} from '../../../app.interface';
 import {createReducer, on, Store} from '@ngrx/store';
 import {
   addChatMessageAction,
@@ -16,13 +16,13 @@ import {
 } from './chat.actions';
 import {createChatNameFromAnswer, createEmptyChat} from '../chat.utils';
 import {createEntityAdapter, EntityAdapter, Update} from '@ngrx/entity';
-import {createId} from '../../../utils';
-import {state} from '@angular/animations';
+import {DEFAULT_MODELS} from '../chat.constants';
 
 export interface ChatState {
   currentChatId: string;
-  lastSelectedModel: GPT_MODEL | string;
+  lastSelectedModelId: string;
   chats: ChatEntities;
+  models: Model[];
 }
 
 export const messagesAdapter: EntityAdapter<Message> = createEntityAdapter<Message>();
@@ -30,21 +30,22 @@ export const chatAdapter: EntityAdapter<Chat> = createEntityAdapter<Chat>();
 
 export const initialChatState: ChatState = {
   currentChatId: '',
-  lastSelectedModel: GPT_MODEL.GPT_35,
+  lastSelectedModelId: '1',
   chats: chatAdapter.getInitialState(),
+  models: DEFAULT_MODELS,
 };
 
 export const chatReducers = createReducer(
   initialChatState,
-  on(initChatsAction, (state, {lastSelectedModel, chats}) => {
-    return {...state, chats: chats, lastSelectedModel};
+  on(initChatsAction, (state, {lastSelectedModelId, chats}) => {
+    return {...state, chats: chats, lastSelectedModelId};
   }),
   on(initCurrentChatAction, (state, {id}) => {
     let updatedChats: Chat[] = [...chatAdapter.getSelectors().selectAll(state.chats)];
     return {...state, currentChatId: id, chats: chatAdapter.upsertMany(updatedChats, state.chats)};
   }),
   on(createNewChatAction, (state, {id}) => {
-    const newChat = createEmptyChat(id, state.lastSelectedModel);
+    const newChat = createEmptyChat(id, state.lastSelectedModelId);
     return {...state, currentChatId: id, chats: chatAdapter.addOne(newChat, state.chats)};
   }),
   on(editChatNameAction, (state, {id, isEditable}) => {
@@ -184,10 +185,10 @@ export const chatReducers = createReducer(
 
     return state;
   }),
-  on(changeChatModelAction, (state, {model}) => {
+  on(changeChatModelAction, (state, {modelId}) => {
     return {
       ...state,
-      lastSelectedModel: model,
+      lastSelectedModelId: modelId,
     };
   }),
 );

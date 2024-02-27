@@ -1,6 +1,6 @@
 import {createFeatureSelector, createSelector} from '@ngrx/store';
 import {chatFeatureKey, ChatState} from './chat.reducers';
-import {Chat} from '../../../app.interface';
+import {Chat, Model} from '../../../app.interface';
 
 const selectChatState = createFeatureSelector<ChatState>(chatFeatureKey);
 
@@ -23,5 +23,18 @@ export const someMessageEditedSelector = createSelector(selectChatState, (chatSt
     return Object.values(currentChat.messages.entities).some((message) => message?.isChanged);
   } else {
     return false;
+  }
+});
+
+export const modelsSelector = createSelector(selectChatState, (chatState: ChatState): Model[] => {
+  return chatState.models;
+});
+
+export const currentModelIdSelector = createSelector(selectChatState, (chatState: ChatState): string => {
+  const currentChat = chatState.chats.entities[chatState.currentChatId];
+  if (currentChat) {
+    return currentChat?.id === 'new' ? chatState.lastSelectedModelId : currentChat.modelId;
+  } else {
+    return chatState.lastSelectedModelId;
   }
 });

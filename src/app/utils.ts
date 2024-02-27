@@ -29,8 +29,9 @@ export const transformStateToConfig = (state: AppState): Config => {
   return {
     chat: {
       currentChatId: chatState.currentChatId,
-      lastSelectedModel: chatState.lastSelectedModel,
+      lastSelectedModelId: chatState.lastSelectedModelId,
       chats: chatsArr,
+      models: chatState.models,
     },
   };
 };

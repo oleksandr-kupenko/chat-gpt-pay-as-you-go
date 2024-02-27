@@ -5,20 +5,20 @@
   </mat-drawer>
   <form class="container vh-100 d-flex flex-column pt-4 pb-2" [formGroup]="chatForm" (ngSubmit)="handleSend()">
     <div class="header-settings d-flex justify-content-between mb-3">
-      <div class="d-flex align-items-center col-10 col-sm-6 col-lg-3 col-xl-4 col-xxl-3">
+      <div class="d-flex align-items-center">
         @if (isShowChatsListBtn()) {
           <button type="button" class="me-4 icon-btn" (click)="handleToggleChatsList(true)">
             <mat-icon class="d-flex" svgIcon="navbar"></mat-icon>
           </button>
         }
-        <mat-form-field class="without-wrapper col-6 col-sm-8">
-          <mat-label>Model</mat-label>
-          <mat-select formControlName="model" (selectionChange)="handleModelChange()">
-            @for (model of models; track model) {
-              <mat-option [value]="model">{{ model.viewValue }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+        @if ((models | async) && modelChatId) {
+          <app-model-select
+            [(modelFormControl)]="$any(chatForm).controls['model']"
+            [models]="models | async"
+            [selectedModelId]="modelChatId | async"
+          ></app-model-select>
+        }
+        <mat-icon class="ms-2" [htmlTooltipIsListenClick]="true" [htmlTooltip]="modelHelpText">info</mat-icon>
       </div>
 
       <div class="header-settings__controls d-flex align-items-center justify-content-sm-between">

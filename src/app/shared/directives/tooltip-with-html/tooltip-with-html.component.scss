@@ -1,0 +1,44 @@
+.mdc-tooltip--shown .mdc-tooltip__surface-animation {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.mdc-tooltip__surface {
+  font-family: var(--mdc-plain-tooltip-supporting-text-font, inherit);
+  font-size: var(--mdc-plain-tooltip-supporting-text-size, inherit);
+  font-weight: var(--mdc-plain-tooltip-supporting-text-weight, inherit);
+  letter-spacing: var(--mdc-plain-tooltip-supporting-text-tracking, inherit);
+}
+
+.mdc-tooltip__surface {
+  color: var(--mdc-plain-tooltip-supporting-text-color, #000);
+  p, a {
+    line-height: 1.4;
+  }
+}
+
+.mdc-tooltip__surface {
+  background-color: var(--mdc-plain-tooltip-container-color, #fff);
+}
+
+.mdc-tooltip__surface {
+  line-height: 16px;
+  padding: 4px 8px;
+  min-width: 40px;
+  max-width: 200px;
+  min-height: 24px;
+  max-height: 40vh;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-align: center;
+}
+
+.mat-mdc-tooltip {
+  --mdc-plain-tooltip-container-color: #616161;
+  --mdc-plain-tooltip-supporting-text-color: white;
+}
+
+.mdc-tooltip--multiline .mdc-tooltip__surface {
+  text-align: left;
+  border-radius: 4px;
+}

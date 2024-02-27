@@ -1,14 +1,14 @@
 import {createAction, props} from '@ngrx/store';
-import {Chat, ChatEntities, GPT_MODEL, Message, RequestData} from '../../../app.interface';
+import {Chat, ChatEntities, Message, RequestData} from '../../../app.interface';
 
 export const initChatsAction = createAction(
   '[[Chat Page] Init Chats',
-  props<{lastSelectedModel: GPT_MODEL | string; chats: ChatEntities}>(),
+  props<{lastSelectedModelId: string; chats: ChatEntities}>(),
 );
 export const initCurrentChatAction = createAction('[Chat Page] Init Current Chat', props<{id: string}>());
 export const addChatMessageAction = createAction('[Chat Page] Add Chat Message', props<{message: Message}>());
 export const getAnswerAction = createAction('[Chat Page] Get Answer', props<{requestData: RequestData}>());
-export const changeChatModelAction = createAction('[Chat Page] Change Model', props<{model: GPT_MODEL}>());
+export const changeChatModelAction = createAction('[Chat Page] Change Model', props<{modelId: string}>());
 
 export const chatNotFound = createAction('[Chat Page] Chat Not Found');
 

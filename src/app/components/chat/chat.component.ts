@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
-import {Chat, GPT_MODEL, Message, ROLE} from '../../app.interface';
+import {Chat, Message, Model, ROLE} from '../../app.interface';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -22,15 +22,21 @@ import {
   getAnswerAction,
   createNewChatAction,
 } from './state/chat.actions';
-import {currentChatSelector, someMessageEditedSelector} from './state/chat.selectors';
+import {
+  currentChatSelector,
+  currentModelIdSelector,
+  modelsSelector,
+  someMessageEditedSelector,
+} from './state/chat.selectors';
 import {AsyncPipe} from '@angular/common';
 import {MessagesComponent} from './components/messages/messages.component';
 import {ActivatedRoute, NavigationExtras, Router} from '@angular/router';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {ChatsListComponent} from './components/chats-list/chats-list.component';
 import {removeMessageId} from './chat.utils';
-
-declare const hljs: any;
+import {TooltipWithHtmlModule} from '../../shared/directives/tooltip-with-html/tooltip-with-html.module';
+import {DEFAULT_MODELS} from './chat.constants';
+import {ModelSelectComponent} from './components/model-select/model-select.component';
 
 @Component({
   selector: 'app-chat',
@@ -53,6 +59,8 @@ declare const hljs: any;
     MessagesComponent,
     MatSidenavModule,
     ChatsListComponent,
+    TooltipWithHtmlModule,
+    ModelSelectComponent,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -66,12 +74,16 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   public isSomeMessageUpdated$!: Observable<boolean>;
 
+  public modelHelpText = `<img alt="GPT models" src="assets/img/models-help.webp">
+<a class="custom-tooltip__href" href="https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo" target="_blank">Models list</a>`;
+
   protected readonly ROLE = ROLE;
 
   public chatForm!: FormGroup;
 
-  private currentChatId!: string;
+  public modelChatId!: Observable<string>;
 
+  private currentChatId!: string;
   private windowWidth = window.innerWidth;
 
   private subs = new Subscription();
@@ -85,12 +97,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    console.log('init');
-    const chatResolverData = this.route.snapshot.data;
+    this.subscribeToModels();
+    this.modelChatId = this.store.pipe(select(currentModelIdSelector));
     this.isSomeMessageUpdated$ = this.store.pipe(select(someMessageEditedSelector));
-    if (chatResolverData) {
-    }
-
     this.checkNeedShowChatListBtn();
     this.initForm();
     this.subscribeToRouteChanges();
@@ -107,17 +116,14 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.checkNeedShowChatListBtn();
   }
 
-  public handleModelChange() {
-    this.store.dispatch(changeChatModelAction(this.chatForm.value.model.value));
-  }
-
   public handleToggleChatsList(status: boolean) {
     this.isChatsListOpened.set(status);
   }
 
   public handleSend() {
     const message: Message = {role: ROLE.user, content: this.chatForm.value.question, id: createId()};
-    const model = this.chatForm.value.model.value;
+    const model = this.chatForm.value.model.model;
+
     if (this.chatForm.valid) {
       if (!this.currentChatId || this.currentChatId === 'new') {
         const id = createId();
@@ -140,15 +146,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  public models: {value: string; viewValue: string}[] = [
-    {value: GPT_MODEL.GPT_35, viewValue: 'GPT-3.5'},
-    {value: GPT_MODEL.GPT_4, viewValue: 'GPT-4'},
-  ];
+  public models!: Observable<Model[]>;
 
   private initForm() {
     this.chatForm = this.fb.group({
-      model: [this.models[0], Validators.required],
       question: ['', [Validators.required]],
+      model: [DEFAULT_MODELS[0], [Validators.required]],
     });
   }
 
@@ -187,5 +190,9 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   private redirectToNewChat(id: string) {
     this.router.navigate(['/chat', id]);
+  }
+
+  private subscribeToModels() {
+    this.models = this.store.pipe(select(modelsSelector));
   }
 }

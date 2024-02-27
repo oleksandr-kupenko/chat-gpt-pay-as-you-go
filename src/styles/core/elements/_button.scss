@@ -75,11 +75,17 @@ body {
     }
 
     &:hover, &.active {
-      background-color: $very-dark-grey;
-
       .list-btn__additional-icon {
         display: flex;
       }
+    }
+
+    &:hover {
+      background-color: $very-dark-grey;
+    }
+
+    &.active {
+      background-color: #2f2f2f;
     }
   }
 

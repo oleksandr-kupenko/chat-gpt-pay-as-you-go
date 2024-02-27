@@ -1,0 +1,13 @@
+@import "core/variables";
+
+.custom-tooltip {
+  max-width: 400px;
+  &__href {
+    color: $text-color;
+    transition: $trs;
+
+    &:hover {
+      color: $grey;
+    }
+  }
+}
