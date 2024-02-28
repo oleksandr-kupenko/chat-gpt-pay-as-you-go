@@ -1,7 +1,13 @@
+# Front for Resume creator
+Chat GPT pay as you go
+
+### [Example of work](https://oleksandr-kupenko.github.io/chat-gpt-pay-as-you-go/browser)
+
 ## Stack
 - Angular 17
 - NgRx
 - @ngrx/entity
+- ngx-highlight-js
 
 At the moment it does not have a backend. Data is saved in local storage.
 
