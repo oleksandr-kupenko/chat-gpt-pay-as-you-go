@@ -77,8 +77,9 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   public isSomeMessageUpdated$!: Observable<boolean>;
 
-  public modelHelpText = `<img alt="GPT models" src="assets/img/models-help.webp">
-<a class="custom-tooltip__href" href="https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo" target="_blank">Models list</a>`;
+  public modelHelpText = `<a class="custom-tooltip__href" href="https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo" target="_blank">
+<img alt="GPT models" src="assets/img/models-help.webp">
+Models list</a>`;
 
   protected readonly ROLE = ROLE;
 

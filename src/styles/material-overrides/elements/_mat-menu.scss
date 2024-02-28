@@ -1,0 +1,13 @@
+@import 'core/variables';
+
+.mat-elevation-z8, .mat-mdc-elevation-specific.mat-elevation-z8 {
+  background-color: $very-dark-grey;
+
+  .mat-mdc-menu-item {
+    color: $text-color;
+  }
+
+  .mat-mdc-menu-item:not([disabled]):hover {
+    background: hsla(0, 0%, 100%, 0.05);
+  }
+}
