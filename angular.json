@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/chat-gpt",
+            "outputPath": "dist/chat-gpt-pay-as-you-go",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -33,14 +33,16 @@
               "@angular/material/prebuilt-themes/indigo-pink.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles/_main.scss",
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/highlight.js/scss/base16/3024.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": ["src/styles"]
             },
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/marked/marked.min.js"
+              "node_modules/marked/marked.min.js",
+              "src/assets/js/highlight.min.js"
             ]
           },
           "configurations": {
