@@ -291,7 +291,6 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase> implement
     this._message = value != null ? String(value).trim() : '';
 
     if (!this._message && this._isTooltipVisible()) {
-      console.log(1);
       this.hide(0);
     } else {
       this._setupPointerEnterEventsIfNeeded();
@@ -434,7 +433,6 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase> implement
 
   /** Shows the tooltip after the delay in ms, defaults to tooltip-delay-show or 0ms if no input */
   show(delay: number | undefined = this.showDelay, origin?: {x: number; y: number}): void {
-    console.log('show');
     if (this.disabled || !this.message || this._isTooltipVisible()) {
       this._tooltipInstance?._cancelPendingAnimations();
       return;
@@ -464,12 +462,10 @@ export abstract class _MatTooltipBase<T extends _TooltipComponentBase> implement
     this._setTooltipClass(this._tooltipClass);
     this._updateTooltipMessage();
     instance.show(delay);
-    console.log(instance);
   }
 
   /** Hides the tooltip after the delay in ms, defaults to tooltip-delay-hide or 0ms if no input */
   hide(delay: number = this.hideDelay): void {
-    console.log('hide');
     const instance = this._tooltipInstance;
 
     if (instance) {

@@ -5,10 +5,6 @@ import {BehaviorSubject, Observable, of} from 'rxjs';
 @Injectable({providedIn: 'root'})
 export class AppService {
   private apiKey$$ = new BehaviorSubject<string | null>(null);
-  private state$$ = new BehaviorSubject<State | null>(null);
-
-  public getApiKey$ = this.apiKey$$.asObservable();
-  public getState$ = this.state$$.asObservable();
 
   setKey(apiKey: string) {
     this.apiKey$$.next(apiKey);
@@ -33,18 +29,9 @@ export class AppService {
     this.apiKey$$.next('');
   }
 
-  public initState() {
-    const savedState = localStorage.getItem(API_KEY);
-    if (savedState) {
-    } else {
-      this.state$$.next(new State());
-    }
-  }
-
   public saveChats(config: Config) {
-    console.log('DATA', config);
     localStorage.setItem(CONFIG, JSON.stringify(config));
-    return of({test: '123'});
+    return of();
   }
 
   public initConfig(): Observable<Config | null> {

@@ -11,7 +11,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {TextFieldModule} from '@angular/cdk/text-field';
 import {Observable, of, Subscription, switchMap} from 'rxjs';
 import {SettingsBtnComponent} from '../../shared/components/settings-btn/settings-btn.component';
-import {convertToHtml, createId} from '../../utils';
+import {createId} from '../../utils';
 import {SafeMarkedPipe} from '../../shared/pipes/marked.pipe';
 import {HttpClientModule} from '@angular/common/http';
 import {select, Store} from '@ngrx/store';
@@ -33,10 +33,11 @@ import {MessagesComponent} from './components/messages/messages.component';
 import {ActivatedRoute, NavigationExtras, Router} from '@angular/router';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {ChatsListComponent} from './components/chats-list/chats-list.component';
-import {removeMessageId} from './chat.utils';
+import {removeAdditionalFields} from './chat.utils';
 import {TooltipWithHtmlModule} from '../../shared/directives/tooltip-with-html/tooltip-with-html.module';
 import {DEFAULT_MODELS} from './chat.constants';
 import {ModelSelectComponent} from './components/model-select/model-select.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-chat',
@@ -61,6 +62,7 @@ import {ModelSelectComponent} from './components/model-select/model-select.compo
     ChatsListComponent,
     TooltipWithHtmlModule,
     ModelSelectComponent,
+    MatTooltipModule,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -69,6 +71,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   public isLoading = signal(false);
   public isShowChatsListBtn = signal(true);
   public messages: WritableSignal<Message[]> = signal([]);
+  public totalTokens: WritableSignal<number> = signal(0);
 
   public isChatsListOpened = signal(false);
 
@@ -138,11 +141,13 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.store.dispatch(addChatMessageAction({message}));
 
       this.store.dispatch(
-        getAnswerAction({requestData: {model, messages: removeMessageId([...this.messages(), message])}}),
+        getAnswerAction({requestData: {model, messages: removeAdditionalFields([...this.messages(), message])}}),
       );
       this.isLoading.set(false);
     } else if (!this.chatForm.value.question) {
-      this.store.dispatch(getAnswerAction({requestData: {model, messages: removeMessageId([...this.messages()])}}));
+      this.store.dispatch(
+        getAnswerAction({requestData: {model, messages: removeAdditionalFields([...this.messages()])}}),
+      );
     }
   }
 
@@ -177,6 +182,7 @@ export class ChatComponent implements OnInit, OnDestroy {
             this.store.dispatch(createNewChatAction({id}));
             this.store.dispatch(initCurrentChatAction({id}));
           } else {
+            this.totalTokens.set(chat.tokens);
             this.messages.set(chat?.messages.ids.map((id) => chat?.messages.entities[id] as Message));
           }
         }),

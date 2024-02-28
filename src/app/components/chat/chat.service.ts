@@ -13,8 +13,6 @@ export class ChatService {
   ) {}
 
   postQuestion(data: RequestData): Observable<ResponseData> {
-    console.log('DATA', data);
-    //return of();
     return this.http.post<ResponseData>(this.API_URL, JSON.stringify(data));
   }
 }

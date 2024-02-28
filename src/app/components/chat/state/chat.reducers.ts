@@ -15,11 +15,11 @@ import {
   initCurrentChatAction,
   saveNewChatNameAction,
   saveNewMessageAction,
+  updateChatTokensAction,
 } from './chat.actions';
 import {createChatNameFromAnswer, createEmptyChat} from '../chat.utils';
 import {createEntityAdapter, EntityAdapter, Update} from '@ngrx/entity';
 import {DEFAULT_MODELS} from '../chat.constants';
-import {filter} from 'rxjs';
 
 export interface ChatState {
   currentChatId: string;
@@ -139,7 +139,7 @@ export const chatReducers = createReducer(
     const updatedChatsState = chatAdapter.updateOne(updatedChat, state.chats);
     return {...state, chats: updatedChatsState};
   }),
-  on(addChatMessageAction, (state, {message}) => {
+  on(addChatMessageAction, (state, {message, tokens}) => {
     const currentChat = state.chats.entities[state.currentChatId];
     let updatedMessagesEntities = messagesAdapter.addOne(message, (currentChat as Chat).messages);
 
@@ -149,6 +149,7 @@ export const chatReducers = createReducer(
       const updatedChat: Chat = {
         ...currentChat,
         messages: updatedMessagesEntities,
+        tokens: tokens?.total_tokens ? tokens?.total_tokens : currentChat.tokens,
         name:
           !currentChat.isRenamed && updatedMessagesEntities.ids.length === 2
             ? createChatNameFromAnswer(message.content)
@@ -189,6 +190,17 @@ export const chatReducers = createReducer(
 
     return state;
   }),
+  // on(updateChatTokensAction, (state, {tokens}) => {
+  //   const currentChat = state.chats.entities[state.currentChatId];
+  //   if (currentChat) {
+  //     const updatedChat = chatAdapter.updateOne(
+  //       {id: state.currentChatId, changes: {tokens: tokens.total_tokens}},
+  //       state.chats,
+  //     );
+  //     return {...state, updatedChat};
+  //   }
+  //   return {...state};
+  // }),
   on(changeChatModelAction, (state, {modelId}) => {
     return {
       ...state,

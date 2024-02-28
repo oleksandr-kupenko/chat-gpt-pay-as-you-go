@@ -26,6 +26,11 @@
           (onTextChanged)="handleCloseEditNameMode($event)"
         ></app-editable-field-input>
       } @else {
+        <div class="message-body-wrapper">
+          <span class="message__tokens list-btn__additional-info" matTooltip="Cost tokens (completion_tokens)">{{
+            message.completion_tokens || ''
+          }}</span>
+        </div>
         @if (isContainCode(message.content)) {
           <div highlight-js mode="default">
             <div class="message__body" [innerHTML]="message.content | safeMarked"></div>

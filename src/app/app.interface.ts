@@ -59,6 +59,7 @@ export interface Message {
   id: string;
   isEditable?: boolean;
   isChanged?: boolean;
+  completion_tokens?: number;
 }
 
 export interface MessageWithoutId extends Omit<Message, 'id'> {
@@ -83,10 +84,12 @@ export interface ResponseData {
       finish_reason: 'stop' | string;
     },
   ];
-  usage: {
-    prompt_tokens: number;
-    completion_tokens: number;
-    total_tokens: number;
-  };
+  usage: ResponseTokens;
   system_fingerprint: null;
+}
+
+export interface ResponseTokens {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
 }

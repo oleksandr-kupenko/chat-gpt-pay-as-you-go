@@ -13,6 +13,7 @@ import {
   getAnswerAction,
   saveNewChatNameAction,
   saveNewMessageAction,
+  updateChatTokensAction,
 } from './chat.actions';
 import {concatMap, map, of, withLatestFrom} from 'rxjs';
 import {catchError} from 'rxjs/operators';
@@ -30,9 +31,11 @@ export const loadAnswer = createEffect(
       }),
       map((response) => {
         const message = response.choices[0].message;
+        const tokens = response.usage;
         store.dispatch(clearMessagesUpdatedStatusAction());
         store.dispatch(chatsSavedAction());
-        return addChatMessageAction({message: addIdToMessage(message)});
+        message.completion_tokens = tokens.completion_tokens;
+        return addChatMessageAction({message: addIdToMessage(message), tokens});
       }),
       catchError((error: {message: string}) => of(chatAnswerFailedAction())),
     );

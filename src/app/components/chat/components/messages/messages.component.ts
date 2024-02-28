@@ -4,7 +4,6 @@ import {
   Component,
   ElementRef,
   Input,
-  OnChanges,
   OnDestroy,
   QueryList,
   signal,
@@ -84,7 +83,6 @@ export class MessagesComponent implements AfterViewInit, OnDestroy {
 
   public handleCloseEditNameMode(newText: {id: string; value: string | null; wasChanged: boolean}) {
     if (newText.wasChanged) {
-      console.log(1);
       this.store.dispatch(saveNewMessageAction({id: newText.id, newContent: newText.value as string}));
     } else {
       this.store.dispatch(editMessageContentAction({id: newText.id, isEditable: false}));

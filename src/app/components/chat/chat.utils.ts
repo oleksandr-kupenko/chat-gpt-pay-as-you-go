@@ -18,8 +18,8 @@ export const addIdToMessage = (message: MessageWithoutId): Message => {
   return {...message, id: createId()};
 };
 
-export const removeMessageId = (messages: Message[]): MessageWithoutId[] => {
-  return messages.map(({id, isChanged, isEditable, ...rest}) => ({...rest}));
+export const removeAdditionalFields = (messages: Message[]): MessageWithoutId[] => {
+  return messages.map(({id, isChanged, isEditable, completion_tokens, ...rest}) => ({...rest}));
 };
 
 export const transformChatsToChatsState = (
@@ -49,10 +49,7 @@ export const createChatNameFromAnswer = (answer: string) => {
 
   lastIndex = lastIndex === -1 ? substring.length : lastIndex;
 
-  const resultSubstring = substring.substring(0, lastIndex);
-  console.log(resultSubstring);
-
-  return resultSubstring;
+  return substring.substring(0, lastIndex);
 };
 
 export const clearHtmlTags = (value: string) => {

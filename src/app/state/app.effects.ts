@@ -13,7 +13,6 @@ export const initConfig = createEffect(
       ofType(initConfigAction),
       concatMap(() => appService.initConfig()),
       map((config) => {
-        console.log('DATA 123', config);
         return configInited({config: config});
       }),
       catchError((error: {message: string}) => of(chatAnswerFailedAction())),

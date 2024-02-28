@@ -34,9 +34,7 @@ export class ModelSelectComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if ((changes['selectedModelId'] || changes['models']) && this.models) {
-      console.log('MODEL 1', this.selectedModelId);
       const model = this.models.find((model) => model.id === this.selectedModelId) || this.models[0];
-      console.log('MODEL 2', this.selectedModelId);
       this.modelFormControl.setValue(model);
     }
   }

@@ -82,6 +82,10 @@ body {
 
     &:hover {
       background-color: $very-dark-grey;
+
+      .list-btn__additional-info {
+        opacity: 0.8;
+      }
     }
 
     &.active {

@@ -26,8 +26,14 @@
       </div>
     </div>
 
-    <div class="h-75 d-inline-block mb-4 border ps-3 pe-3 pt-2 pb-2 overflow-auto">
+    <div class="h-75 d-inline-block border ps-3 pe-3 overflow-auto">
       <app-messages [messages]="messages()"></app-messages>
+    </div>
+
+    <div class="tokens-counter mt-2 mb-3">
+      <span class="tokens-counter__value" matTooltip="Total tokens (completion_tokens + prompt_tokens)">{{
+        totalTokens() || ''
+      }}</span>
     </div>
 
     <div class="row h-25 d-flex justify-content-center">
