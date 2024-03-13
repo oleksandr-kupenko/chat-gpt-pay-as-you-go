@@ -1,5 +1,4 @@
-# Front for Resume creator
-Chat GPT pay as you go
+# Chat GPT pay as you go
 
 ### [Example of work](https://oleksandr-kupenko.github.io/chat-gpt-pay-as-you-go/browser)
 
